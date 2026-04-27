@@ -9,7 +9,7 @@ set -x
 export NCCL_ALGO=Ring,Tree
 export FORCE_BUILD=0
 export VLLM_ATTENTION_BACKEND=FLASH_ATTN
-export PYTORCH_CUDA_ALLOC_CONF="max_split_size_mb:512"
+export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True,max_split_size_mb:64"
 
 export VLLM_USE_V1=1
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
@@ -28,7 +28,7 @@ export HYDRA_FULL_ERROR=1
 
 # export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
-MODEL_PATH=/home/docker/drkernel-8b-codestart
+MODEL_PATH=/home/docker/cszhou_sft_weight/global_step_100
 
 echo "正在重启 Ray 集群..."
 ray stop --force
@@ -70,7 +70,7 @@ ARGS=(
   # =========================
   actor_rollout_ref.actor.optim.lr=1e-6
   actor_rollout_ref.actor.loss_agg_mode=seq-mean-token-mean
-  actor_rollout_ref.actor.ppo_mini_batch_size=8     # 实际 minibatch_size = minibatch_size * n_rollout // dp_size
+  actor_rollout_ref.actor.ppo_mini_batch_size=2
   actor_rollout_ref.actor.use_dynamic_bsz=True
   actor_rollout_ref.actor.ppo_max_token_len_per_gpu=32768
   actor_rollout_ref.actor.use_kl_loss=False
@@ -93,10 +93,10 @@ ARGS=(
 
   actor_rollout_ref.actor.megatron.tensor_model_parallel_size=4
   actor_rollout_ref.actor.megatron.pipeline_model_parallel_size=1
-  actor_rollout_ref.actor.megatron.context_parallel_size=2
+  actor_rollout_ref.actor.megatron.context_parallel_size=1
   actor_rollout_ref.actor.megatron.expert_model_parallel_size=1
   actor_rollout_ref.actor.megatron.expert_tensor_parallel_size=1
-  +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=2
+  +actor_rollout_ref.actor.megatron.override_transformer_config.context_parallel_size=1
   #+actor_rollout_ref.actor.megatron.override_transformer_config.use_flash_attn=True
   +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_method=uniform
   +actor_rollout_ref.actor.megatron.override_transformer_config.recompute_granularity=full
@@ -119,7 +119,7 @@ ARGS=(
   actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=32768
   actor_rollout_ref.ref.megatron.tensor_model_parallel_size=4
   actor_rollout_ref.ref.megatron.pipeline_model_parallel_size=1
-  actor_rollout_ref.ref.megatron.context_parallel_size=2
+  actor_rollout_ref.ref.megatron.context_parallel_size=1
   actor_rollout_ref.ref.megatron.expert_model_parallel_size=1
   actor_rollout_ref.ref.megatron.expert_tensor_parallel_size=1
   actor_rollout_ref.ref.megatron.param_offload=True
@@ -137,13 +137,12 @@ ARGS=(
   actor_rollout_ref.rollout.temperature=1.0
   actor_rollout_ref.rollout.top_p=1.0
   actor_rollout_ref.rollout.gpu_memory_utilization=0.7
-  actor_rollout_ref.rollout.max_model_len=32768
+  actor_rollout_ref.rollout.max_model_len=65536
   actor_rollout_ref.rollout.n=16
   actor_rollout_ref.rollout.val_kwargs.n=4
   actor_rollout_ref.rollout.val_kwargs.temperature=0.0
   actor_rollout_ref.rollout.val_kwargs.top_p=1.0
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1
-  ++actor_rollout_ref.rollout.engine_kwargs.max_num_seqs=64
   ++actor_rollout_ref.rollout.checkpoint_engine.update_weights_bucket_megabytes=4096
 
   rllm.rejection_sample.enable=True
@@ -152,10 +151,10 @@ ARGS=(
   # rllm
   # =========================
   rllm.mask_truncated_samples=False
-  +rllm.agent.engine_args.n_parallel_agents=96
+  +rllm.agent.engine_args.n_parallel_agents=16
   rllm.agent.max_steps=3
   rllm.stepwise_advantage.enable=True
-  rllm.stepwise_advantage.mode=broadcast #per_step
+  rllm.stepwise_advantage.mode=per_step
 
   # =========================
   # trainer
@@ -163,9 +162,9 @@ ARGS=(
   trainer.critic_warmup=0
   trainer.logger=[console,wandb]
   trainer.project_name=rllm-agent
-  trainer.experiment_name=kernelgym-qwen8b
+  trainer.experiment_name=kernelgym-qwen30b
   trainer.val_before_train=False
-  trainer.n_gpus_per_node=8
+  trainer.n_gpus_per_node=4
   trainer.nnodes=1
   trainer.device=cuda
   trainer.save_freq=20
@@ -179,7 +178,7 @@ ARGS=(
 
   reward_model.max_turns=3
   reward_model.reference_backend=triton
-  reward_model.server_url="http://51.62.5.13:8202"
+  reward_model.server_url="http://127.0.0.1:8002"
   reward_model.reward_func_name=calculate_reward_weighted
   reward_model.init_correct_weight=0.5
   reward_model.init_performance_weight=0.5
@@ -215,4 +214,4 @@ ARGS=(
 
 #ray job submit --address="http://${MASTER_ADDR}:8265" \
 #    -- \
-/usr/bin/python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}" 2>&1| tee "gpu_training_$(date +%Y%m%d_%H%M%S).log"
+    /usr/bin/python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}"

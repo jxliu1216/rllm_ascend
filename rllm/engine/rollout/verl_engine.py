@@ -64,7 +64,7 @@ class VerlEngine(RolloutEngine):
         sampling_params["max_tokens"] = max_tokens
 
         prompt = self.chat_parser.parse(messages, add_generation_prompt=True, is_first_msg=True, tools=tools, accumulate_reasoning=accumulate_reasoning)
-        request_prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False)  # list[int]
+        request_prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False)  # list[int]               # TODO. 这里会出现训推不一致.
 
         if any(msg.get("images", None) is not None and msg["role"] == "user" for msg in messages) and self.processor is not None:
             image_data = self.chat_parser.process_image_data(messages)  # list[PIL.Image.Image]
