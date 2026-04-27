@@ -10,7 +10,7 @@ import socket
 import hydra
 import ray
 from omegaconf import OmegaConf
-import torch_npu
+# import torch_npu
 from verl.trainer.ppo.ray_trainer import Role
 from verl.trainer.ppo.reward import load_reward_manager
 from verl.trainer.ppo.utils import need_critic, need_reference_policy

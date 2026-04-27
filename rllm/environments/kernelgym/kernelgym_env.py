@@ -29,6 +29,8 @@ class _HybridHttpWorker:
             timeout=httpx.Timeout(connect=10.0, read=self.default_timeout, write=10.0, pool=5.0),
             limits=self._limits,
             headers={"Content-Type": "application/json"},
+            proxy=None,
+            trust_env=False,
         )
         # TokenBucketWorker 是一个全局视角的 token 计数器
         # self._rate_limit_worker = TokenBucketWorker.options(name="rate-limiter", get_if_exists=True).remote(rate_limit)
@@ -211,7 +213,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             error_message = result.get("error_message", "Task failed")          # TODO. 这里获取的message有问题，总是Task Failed
             if error_message == "Task failed":
                 error_message = result.get("error", "Task failed")
-            logger.debug(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
+            logger.warning(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
             logger.debug(f"[HybridClient] Task failed result: {result}")
             return {
                 "reward": -1.0,
@@ -723,11 +725,11 @@ class KernelGymEnv(MultiTurnEnvironment):
         return self.task, {}
 
 
-    def step(self, action: str, global_steps: int = 0) -> Tuple[Dict[str, Any], float, bool, dict]:
+    def step(self, action: str) -> Tuple[Dict[str, Any], float, bool, dict]:
         self.history.append(action)
 
         #! kernelGYM 要求 task_id 为 problem_session_round 的形式，如果错误匹配，可能不会触发校验，直接走缓存。
-        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{uuid.uuid4().hex[:2]}|i{global_steps}|{self.current_turn}"
+        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{uuid.uuid4().hex[:2]}{self.current_turn}"
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
         task = {

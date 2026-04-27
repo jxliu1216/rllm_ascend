@@ -3,7 +3,7 @@ import json
 import math
 import os
 import uuid
-import torch_npu
+# import torch_npu
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import reduce
 from pprint import pprint
@@ -31,7 +31,7 @@ from verl.utils.metric import reduce_metrics
 from rllm.engine.agent_execution_engine import AsyncAgentExecutionEngine
 
 import torch
-import torch_npu
+# import torch_npu
 
 
 class AgentPPOTrainer(RayPPOTrainer):
