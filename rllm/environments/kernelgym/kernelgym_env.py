@@ -211,7 +211,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             error_message = result.get("error_message", "Task failed")          # TODO. 这里获取的message有问题，总是Task Failed
             if error_message == "Task failed":
                 error_message = result.get("error", "Task failed")
-            print(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
+            logger.debug(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
             logger.debug(f"[HybridClient] Task failed result: {result}")
             return {
                 "reward": -1.0,
