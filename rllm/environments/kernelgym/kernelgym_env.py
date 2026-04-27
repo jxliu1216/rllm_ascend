@@ -44,6 +44,9 @@ class _HybridHttpWorker:
         # except Exception:
         #     return -1
         return 0
+    
+    def shutdown(self):
+        self._client.close()
 
     def submit_and_poll(self, task_data: Dict[str, Any], client_timeout: int, max_retries: Optional[int]) -> Dict[str, Any]:
         """Submit task and poll for results.
@@ -725,11 +728,11 @@ class KernelGymEnv(MultiTurnEnvironment):
         return self.task, {}
 
 
-    def step(self, action: str) -> Tuple[Dict[str, Any], float, bool, dict]:
+    def step(self, action: str, global_steps: int = 0) -> Tuple[Dict[str, Any], float, bool, dict]:
         self.history.append(action)
 
         #! kernelGYM 要求 task_id 为 problem_session_round 的形式，如果错误匹配，可能不会触发校验，直接走缓存。
-        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{uuid.uuid4().hex[:2]}{self.current_turn}"
+        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{uuid.uuid4().hex[:2]}|i{global_steps}|{self.current_turn}"
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
         task = {
@@ -765,6 +768,8 @@ class KernelGymEnv(MultiTurnEnvironment):
 
         return next_obs, reward, self.done, self.task
 
+    def close(self):
+        self._worker
 
     @staticmethod
     def from_dict(env_args: dict) -> "KernelGymEnv":

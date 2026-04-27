@@ -9,7 +9,7 @@ set -x
 export NCCL_ALGO=Ring,Tree
 export FORCE_BUILD=0
 export VLLM_ATTENTION_BACKEND=FLASH_ATTN
-export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True,max_split_size_mb:64"
+export PYTORCH_CUDA_ALLOC_CONF="max_split_size_mb:512"
 
 export VLLM_USE_V1=1
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
@@ -28,7 +28,7 @@ export HYDRA_FULL_ERROR=1
 
 # export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
-MODEL_PATH=/home/docker/cszhou_sft_weight/global_step_100
+MODEL_PATH=/home/docker/drkernel-8b-codestart
 
 echo "正在重启 Ray 集群..."
 ray stop --force
@@ -137,7 +137,7 @@ ARGS=(
   actor_rollout_ref.rollout.temperature=1.0
   actor_rollout_ref.rollout.top_p=1.0
   actor_rollout_ref.rollout.gpu_memory_utilization=0.7
-  actor_rollout_ref.rollout.max_model_len=65536
+  actor_rollout_ref.rollout.max_model_len=32768
   actor_rollout_ref.rollout.n=16
   actor_rollout_ref.rollout.val_kwargs.n=4
   actor_rollout_ref.rollout.val_kwargs.temperature=0.0
