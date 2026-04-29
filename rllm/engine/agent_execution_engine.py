@@ -1,5 +1,7 @@
 import asyncio
+import json
 import logging
+import os
 import time
 import traceback
 import uuid
@@ -24,6 +26,9 @@ from rllm.parser import ChatTemplateParser
 from rllm.utils import colorful_print
 
 logger = logging.getLogger(__name__)
+
+# 非空：在此绝对路径下创建子目录 `token_mismatch/` 并写入 JSON；空字符串则仍用 trainer.default_local_dir（或当前工作目录）。
+TOKEN_MISMATCH_PARENT_DIR = ""
 
 
 class AgentExecutionEngine:
@@ -413,6 +418,29 @@ class AgentExecutionEngine:
             return trajectory
         elif mode == "Token":
             prompt_tokens, response_tokens, response_masks, is_valid_trajectory = self.assemble_steps(episode_steps)
+            if not is_valid_trajectory:
+                if (TOKEN_MISMATCH_PARENT_DIR or "").strip():
+                    root = os.path.abspath(TOKEN_MISMATCH_PARENT_DIR.strip())
+                else:
+                    tr = getattr(self.config, "trainer", None) if self.config else None
+                    root = os.path.abspath(tr.get("default_local_dir")) if tr and tr.get("default_local_dir") else os.getcwd()
+                path = os.path.join(root, "token_mismatch", f"mismatch_{idx}_{uuid.uuid4().hex[:12]}.json")
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(
+                        {
+                            "idx": idx,
+                            "reward": float(trajectory.reward),
+                            "application_id": str(application_id),
+                            "termination_reason": termination_reason,
+                            "steps": [{"prompt": s.get("prompt", "") or "", "response": s.get("response", "") or ""} for s in episode_steps],
+                            "chat_completions": agent.chat_completions,
+                        },
+                        f,
+                        ensure_ascii=False,
+                        indent=2,
+                        default=str,
+                    )
             token_result = {
                 "prompt_tokens": prompt_tokens,
                 "response_tokens": response_tokens,
