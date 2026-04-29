@@ -312,7 +312,7 @@ async def kernelgym_rollout(
     total_generation_time = 0.0
     total_eval_time = 0.0
     last_reward = 0.0
-    best_reward = 0.0
+    best_reward: Optional[float] = None
     last_result: dict[str, Any] = {}
     overlong = False
     num_turns = 0
@@ -330,7 +330,7 @@ async def kernelgym_rollout(
             gen_time = time.time() - gen_start
             total_generation_time += gen_time
 
-            action = agent.update_from_model(response_msg.get("content", ""))
+            action = agent.update_from_model(response_msg.get("content") or "")
             protocol_trajectory.append(output.to_sequence())
             total_completion_tokens += output.num_output_tokens
 
@@ -372,7 +372,9 @@ async def kernelgym_rollout(
                 error_msg = last_result.get("error_message")
 
             last_reward = rops.score_from_merged(last_result)
-            best_reward = max(best_reward, last_reward)
+            best_reward = (
+                last_reward if best_reward is None else max(best_reward, last_reward)
+            )
 
             if turn == max_turns - 1:
                 break
@@ -419,7 +421,7 @@ async def kernelgym_rollout(
         "total_eval_time": total_eval_time,
         "total_completion_tokens": total_completion_tokens,
         "last_reward": last_reward,
-        "best_reward": best_reward,
+        "best_reward": best_reward if best_reward is not None else 0.0,
         "compiled": float(lr.get("compiled", False)),
         "correctness": float(lr.get("correctness", False) or False),
         "speedup": float(lr.get("speedup") or 0.0),

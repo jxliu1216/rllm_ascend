@@ -40,20 +40,6 @@ def main(config):
     train_dataset = _load_or_register("kernelbench", "train", train_fallback)
     test_dataset = _load_or_register("kernelbench", "test", val_fallback)
 
-    agent_args = {
-        "system_prompt": (
-            "You are an expert GPU kernel engineer. Your task is to write a "
-            "high-performance CUDA or Triton kernel that is functionally equivalent "
-            "to the given PyTorch reference implementation, but runs faster.\n\n"
-            "Instructions:\n"
-            "1. Study the reference PyTorch implementation carefully.\n"
-            "2. Implement a custom kernel as a Python class named `ModelNew`.\n"
-            "3. Your implementation must pass correctness checks.\n"
-            "4. Optimise for speed.\n"
-            "5. Wrap your final code inside <kernel> ... </kernel> tags."
-        ),
-    }
-
     kernel_cfg = config.get("kernel", {})
     env_args = {
         "kernel_server_url": kernel_cfg.get("server_url", "http://localhost:8000"),
@@ -81,7 +67,7 @@ def main(config):
     trainer = AgentTrainer(
         agent_class=KernelAgent,
         env_class=KernelGymEnv,
-        agent_args=agent_args,
+        agent_args={},
         env_args=env_args,
         config=config,
         train_dataset=train_dataset,
@@ -92,4 +78,3 @@ def main(config):
 
 if __name__ == "__main__":
     main()
-
