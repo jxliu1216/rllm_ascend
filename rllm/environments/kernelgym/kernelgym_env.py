@@ -29,6 +29,8 @@ class _HybridHttpWorker:
             timeout=httpx.Timeout(connect=10.0, read=self.default_timeout, write=10.0, pool=5.0),
             limits=self._limits,
             headers={"Content-Type": "application/json"},
+            proxy=None,
+            trust_env=False,
         )
         # TokenBucketWorker 是一个全局视角的 token 计数器
         # self._rate_limit_worker = TokenBucketWorker.options(name="rate-limiter", get_if_exists=True).remote(rate_limit)
@@ -42,6 +44,9 @@ class _HybridHttpWorker:
         # except Exception:
         #     return -1
         return 0
+    
+    def shutdown(self):
+        self._client.close()
 
     def submit_and_poll(self, task_data: Dict[str, Any], client_timeout: int, max_retries: Optional[int]) -> Dict[str, Any]:
         """Submit task and poll for results.
@@ -153,7 +158,7 @@ class KernelGymEnv(MultiTurnEnvironment):
     在 KernelGymEnv(rllm) 中, 数据是以单条输入的, 因此我们不再使用这种结构, 
     转而直接发送Http请求。
     '''
-    def __init__(self, task: dict | None = None, config:omegaconf.DictConfig = omegaconf.DictConfig({})):
+    def __init__(self, task: dict | None = None, config:omegaconf.DictConfig = omegaconf.DictConfig({}), message_passthrough:bool = False):
         super().__init__(task=task, max_turns=config.max_turns)
 
         assert task is not None
@@ -202,6 +207,9 @@ class KernelGymEnv(MultiTurnEnvironment):
         self._worker = _HybridHttpWorker(
             self.server_url, self.rate_limit, int(self.timeout), self.acquire_timeout
         )
+        
+        # 指示消息是否会直接透传至KernelGym
+        self.message_passthrough = message_passthrough
 
         self.logger = logging.getLogger(__name__)
 
@@ -211,7 +219,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             error_message = result.get("error_message", "Task failed")          # TODO. 这里获取的message有问题，总是Task Failed
             if error_message == "Task failed":
                 error_message = result.get("error", "Task failed")
-            logger.debug(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
+            logger.warning(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
             logger.debug(f"[HybridClient] Task failed result: {result}")
             return {
                 "reward": -1.0,
@@ -609,6 +617,7 @@ class KernelGymEnv(MultiTurnEnvironment):
                 "enable_profiling": task.get("enable_profiling", True),
                 "detect_decoy_kernel": task.get("detect_decoy_kernel", True),
                 "reference_backend": task.get("reference_backend", None),
+                "llm_messages": task.get("llm_messages", "")
             }
 
             #! 当算子需要验证时，强制开启 detect_decoy_kernel
@@ -718,7 +727,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         self._last_error = None
         self._last_result = None
 
-        self.session_uuid = uuid.uuid4().hex[:16]
+        self.session_uuid = uuid.uuid4().hex[:4]
 
         return self.task, {}
 
@@ -727,7 +736,13 @@ class KernelGymEnv(MultiTurnEnvironment):
         self.history.append(action)
 
         #! kernelGYM 要求 task_id 为 problem_session_round 的形式，如果错误匹配，可能不会触发校验，直接走缓存。
-        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{uuid.uuid4().hex[:2]}|i{global_steps}|{self.current_turn}"
+        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{global_steps}|{self.current_turn}"
+
+        # self.message_passthrough
+        llm_messages = ""
+        if self.message_passthrough:
+            assert "<|message_passtrhough|>" in action
+            action, llm_messages = action.split("<|message_passtrhough|>")
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
         task = {
@@ -747,6 +762,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             "verbose_errors": self.verbose_errors,
             "detect_decoy_kernel": self.detect_decoy_kernel,
             "reference_backend": self.reference_backend,
+            "llm_messages": llm_messages
         }
 
         reward, meta_info = self.get_reward_and_next_obs(task, action=action)
@@ -755,6 +771,9 @@ class KernelGymEnv(MultiTurnEnvironment):
         next_obs = meta_info["server_result"]
 
         self.meta_info_history.append(meta_info)
+        # # import torch
+        # import numpy as np
+        # reward = np.random.randint(0,2)*np.random.randn()
 
         self.current_turn += 1
         if self.current_turn >= self.max_turns:
@@ -763,6 +782,8 @@ class KernelGymEnv(MultiTurnEnvironment):
 
         return next_obs, reward, self.done, self.task
 
+    def close(self):
+        self._worker
 
     @staticmethod
     def from_dict(env_args: dict) -> "KernelGymEnv":
