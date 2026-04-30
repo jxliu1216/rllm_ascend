@@ -801,6 +801,17 @@ class AgentPPOTrainer(RayPPOTrainer):
     def _transform_agent_steps(self, steps: list[dict], uids: np.ndarray):
         from verl.utils.torch_functional import pad_sequence_to_length
 
+        def _to_token_tensor(token_ids, field_name: str, traj_idx: int, step_idx: int) -> torch.Tensor:
+            if token_ids is None:
+                raise ValueError(
+                    f"Missing `{field_name}` for trajectory idx={traj_idx}, step={step_idx}. "
+                    "Step-wise training requires rollout-provided token ids to avoid retokenization mismatch."
+                )
+            token_tensor = torch.as_tensor(token_ids, dtype=torch.long)
+            if token_tensor.ndim != 1:
+                token_tensor = token_tensor.reshape(-1)
+            return token_tensor
+
         overlong_filter = self.config.rllm.agent.get("overlong_filter", False)
         overlong_reasons = {"TRUNCATION", "MAX_STEPS", "TIMEOUT"}
 
@@ -825,15 +836,40 @@ class AgentPPOTrainer(RayPPOTrainer):
             mc_returns = episode["mc_returns"]
             termination_reason = episode.get("termination_reason")
 
+            if not episode_steps:
+                raise ValueError(f"Trajectory idx={idx} contains zero steps, cannot build step-wise training batch.")
+
             # Mask out overlong trajectories
             masked_out = overlong_filter and termination_reason in overlong_reasons
 
-            all_prompts_list.extend([torch.tensor(self.tokenizer.encode(s["prompt"], add_special_tokens=False), dtype=torch.long) for s in episode_steps])
-            all_responses_list.extend([torch.tensor(self.tokenizer.encode(s["response"], add_special_tokens=False), dtype=torch.long) for s in episode_steps])
+            episode_rollout_logprobs_list = []
+            episode_logprob_presence = []
+            for step_idx, step in enumerate(episode_steps):
+                prompt_tokens = _to_token_tensor(step.get("prompt_ids"), "prompt_ids", idx, step_idx)
+                response_tokens = _to_token_tensor(step.get("completion_ids"), "completion_ids", idx, step_idx)
+                all_prompts_list.append(prompt_tokens)
+                all_responses_list.append(response_tokens)
 
-            # 处理 rollout_logprobs
-            if episode_steps and "logprobs" in episode_steps[0]:
-                all_rollout_logprobs_list.extend([torch.tensor(s["logprobs"], dtype=torch.float32) for s in episode_steps])
+                step_logprobs = step.get("logprobs")
+                has_logprobs = step_logprobs is not None
+                episode_logprob_presence.append(has_logprobs)
+                if has_logprobs:
+                    logprobs_tensor = torch.as_tensor(step_logprobs, dtype=torch.float32)
+                    if logprobs_tensor.ndim != 1:
+                        logprobs_tensor = logprobs_tensor.reshape(-1)
+                    if logprobs_tensor.numel() != response_tokens.numel():
+                        raise ValueError(
+                            f"rollout logprobs length mismatch for trajectory idx={idx}, step={step_idx}: "
+                            f"len(logprobs)={logprobs_tensor.numel()} vs len(completion_ids)={response_tokens.numel()}"
+                        )
+                    episode_rollout_logprobs_list.append(logprobs_tensor)
+
+            if any(episode_logprob_presence):
+                if not all(episode_logprob_presence):
+                    raise ValueError(
+                        f"Inconsistent rollout logprobs for trajectory idx={idx}: some steps contain logprobs while others are missing."
+                    )
+                all_rollout_logprobs_list.extend(episode_rollout_logprobs_list)
 
             step_numbers.append(len(episode_steps) - 1)
             training_rewards.append(training_reward)
