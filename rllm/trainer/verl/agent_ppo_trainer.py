@@ -106,6 +106,8 @@ class AgentPPOTrainer(RayPPOTrainer):
         """
         assert self.agent_class is not None and self.env_class is not None, "Agent and environment classes must be provided"
         env_args = batch.non_tensor_batch["extra_info"].tolist()
+        is_validation = bool(getattr(batch, "meta_info", {}).get("validate", False))
+        eval_tag = "validation" if is_validation else "train"
 
         full_agent_args = dict(self.config.rllm.agent.get("agent_args", {})) | self.agent_args
         base_env_args = dict(self.config.rllm.env.get("env_args", {})) | self.env_args
@@ -113,7 +115,10 @@ class AgentPPOTrainer(RayPPOTrainer):
         def _create_env(i):
             if isinstance(env_args[i], str):
                 env_args[i] = json.loads(env_args[i])
-            return i, self.env_class.from_dict({**env_args[i], **base_env_args})
+            task_payload = dict(env_args[i])
+            # Explicitly propagate phase to env task; env must not infer this from config.
+            task_payload["eval_tag"] = task_payload.get("eval_tag", eval_tag)
+            return i, self.env_class.from_dict({**task_payload, **base_env_args})
 
         def _create_agent(i):
             return i, self.agent_class(**full_agent_args)
