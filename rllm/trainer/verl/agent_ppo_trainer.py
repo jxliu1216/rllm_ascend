@@ -201,37 +201,8 @@ class AgentPPOTrainer(RayPPOTrainer):
                         batch = batch.union(final_gen_batch_output)
                         metrics.update(generate_metrics)
                     
-                    # ========== 显存快照：sleep 前 ==========
-                    # rank = torch.distributed.get_rank() if torch.distributed.is_initialized() else 0
-                    # # 只在特定 step + 特定 rank 打，避免刷爆磁盘
-                    # do_snapshot = rank in (0, 8)  # rank 0 和 rank 8 代表两个节点/两组卡
-                    
-                    # if do_snapshot:
-                    #     torch_npu.npu.empty_cache()  # 先清一下 cache,让数据更干净
-                    #     before_alloc = torch_npu.npu.memory_allocated() / 1024**3
-                    #     before_reserved = torch_npu.npu.memory_reserved() / 1024**3
-                    #     print(f"[MEM] rank={0} BEFORE sleep: allocated={before_alloc:.2f}GB, reserved={before_reserved:.2f}GB", flush=True)
-                        
-                    #     torch_npu.npu.memory._record_memory_history(context='all', stacks='python')
-
                     # fix issue
                     self.checkpoint_manager.sleep_replicas()
-
-                    # ========== 显存快照：sleep 后 ==========
-                    # if do_snapshot:
-                    #     torch_npu.npu.empty_cache()
-                    #     after_alloc = torch_npu.npu.memory_allocated() / 1024**3
-                    #     after_reserved = torch_npu.npu.memory_reserved() / 1024**3
-                    #     print(f"[MEM] rank={0} AFTER sleep: allocated={after_alloc:.2f}GB, reserved={after_reserved:.2f}GB", flush=True)
-                    #     print(f"[MEM] rank={0} DIFF: alloc={before_alloc-after_alloc:+.2f}GB, reserved={before_reserved-after_reserved:+.2f}GB", flush=True)
-                        
-                    #     snapshot_path = f"/tmp/mem_snapshot_step{self.global_steps}_rank{0}.pickle"
-                    #     torch_npu.npu.memory._dump_snapshot(snapshot_path)
-                    #     torch_npu.npu.memory._record_memory_history(enabled=None)
-                    #     print(f"[MEM] rank={0} snapshot dumped to {snapshot_path}", flush=True)
-                    
-                    # fix issue
-                    # self.checkpoint_manager.sleep_replicas()
 
                     # compute values
                     if self.use_critic:
@@ -296,6 +267,10 @@ class AgentPPOTrainer(RayPPOTrainer):
 
                             # If no valid samples remain, skip this batch and get a new one
                             if not valid_mask.any():
+                                # update weights from trainer to rollout
+                                with marked_timer("update_weights", timing_raw):
+                                    self.checkpoint_manager.update_weights(self.global_steps)
+                                print("\033[34m[WARNING] No Valid Trajectory. Skip Step.\033[0m")
                                 continue
 
                             # Filter batch to keep only valid samples
@@ -826,6 +801,7 @@ class AgentPPOTrainer(RayPPOTrainer):
 
         all_prompts_list = []
         all_responses_list = []
+        all_rollout_logprobs_list = []
 
         step_numbers = []  # number of steps of each episode, 0 indexed
         all_steps_idx_list = []
@@ -849,6 +825,10 @@ class AgentPPOTrainer(RayPPOTrainer):
 
             all_prompts_list.extend([torch.tensor(self.tokenizer.encode(s["prompt"], add_special_tokens=False), dtype=torch.long) for s in episode_steps])
             all_responses_list.extend([torch.tensor(self.tokenizer.encode(s["response"], add_special_tokens=False), dtype=torch.long) for s in episode_steps])
+
+            # 处理 rollout_logprobs
+            if episode_steps and "logprobs" in episode_steps[0]:
+                all_rollout_logprobs_list.extend([torch.tensor(s["logprobs"], dtype=torch.float32) for s in episode_steps])
 
             step_numbers.append(len(episode_steps) - 1)
             training_rewards.append(training_reward)
@@ -881,6 +861,28 @@ class AgentPPOTrainer(RayPPOTrainer):
         )
         response_batch = pad_sequence_to_length(response_batch, max_response_length, self.tokenizer.pad_token_id, left_pad=False)
         response_batch = response_batch[:, :max_response_length]
+
+        #! rollout_logprobs
+
+        rollout_logprobs_batch = None
+        if (
+            all_rollout_logprobs_list
+            and len(all_rollout_logprobs_list) == len(all_responses_list)
+            and all(
+                len(logprobs) == len(response)
+                for logprobs, response in zip(all_rollout_logprobs_list, all_responses_list)
+            )
+        ):
+            rollout_logprobs_batch = torch.nn.utils.rnn.pad_sequence(
+                all_rollout_logprobs_list,
+                batch_first=True,
+                padding_value=-100.0,
+            )
+            rollout_logprobs_batch = pad_sequence_to_length(
+                rollout_logprobs_batch, max_response_length, -100.0, left_pad=False
+            )
+            rollout_logprobs_batch = rollout_logprobs_batch[:, :max_response_length]
+            rollout_logprobs_batch = rollout_logprobs_batch.to(torch.float32)
 
         # input_ids
         complete_step_batch = torch.concat([prompts_batch, response_batch], dim=1)
@@ -931,6 +933,8 @@ class AgentPPOTrainer(RayPPOTrainer):
             "mc_returns": mc_return_batch,
             "response_mask": traj_mask,
         }
+        if rollout_logprobs_batch is not None:
+            tensor_batch["rollout_log_probs"] = rollout_logprobs_batch
 
         batch_id = str(uuid.uuid4())
         non_tensor_batch = {
@@ -1047,11 +1051,15 @@ class AgentPPOTrainer(RayPPOTrainer):
         if not world_sizes:
             return batch
 
+        actual_ppo_mini_batch_size = self.config.actor_rollout_ref.actor.ppo_mini_batch_size*self.config.actor_rollout_ref.rollout.n
+        world_sizes.append(actual_ppo_mini_batch_size)
         world_size = reduce(math.lcm, world_sizes)
 
         original_batch_size = batch.batch["prompts"].shape[0]
         batch, pad_size = pad_dataproto_to_divisor(batch, world_size)
 
+        print(f"[SZH Debug] World Sizes={world_sizes}, world_size = {world_size}, original_batch_size={original_batch_size}, "
+              f"pad_size={pad_size}")
         # for the padded dataproto, make the traj mask to 0. is_last_step also False
         for i in range(pad_size):
             idx = original_batch_size + i
