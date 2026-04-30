@@ -204,6 +204,8 @@ class KernelGymEnv(MultiTurnEnvironment):
         self.detect_decoy_kernel = config.detect_decoy_kernel
         self.reference_backend = config.reference_backend
         self.train_id = str(getattr(config, "train_id", "") or "")
+        # eval_tag must be task-scoped (rollout vs validate), not config-scoped.
+        self.eval_tag = ""
 
         self._worker = _HybridHttpWorker(
             self.server_url, self.rate_limit, int(self.timeout), self.acquire_timeout
@@ -346,7 +348,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             error_message = result.get("error_message", "Task failed")
             if error_message == "Task failed":
                 error_message = result.get("error", "Task failed")
-            print(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
+            logger.debug(f"[HybridClient] calculate_reward_like_kernel error_message: {error_message}")
             logger.debug(f"[HybridClient] Task failed result: {result}")
 
             return_result = {
@@ -603,9 +605,11 @@ class KernelGymEnv(MultiTurnEnvironment):
                 per_task_timeout_in_client = per_task_timeout
 
             #! 构造请求
+            eval_tag = str(task.get("eval_tag", "") or ("validation" if task.get("is_valid", self.is_valid) else "train"))
             payload = {
                 "task_id": task.get("task_id"),
                 "train_id": task.get("train_id", self.train_id),
+                "eval_tag": eval_tag,
                 "reference_code": task.get("reference_code", ""),
                 "kernel_code": kcode,
                 "backend": self.reference_backend,
@@ -747,16 +751,20 @@ class KernelGymEnv(MultiTurnEnvironment):
             action, llm_messages = action.split("<|message_passtrhough|>")
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
+        task_is_valid = task.get("is_valid", self.is_valid)
+        task_eval_tag = str(task.get("eval_tag", "") or ("validation" if task_is_valid else "train"))
         task = {
             "task_id": task_id,
             "train_id": self.train_id,
+            # Task-scoped tag: explicit task.eval_tag first, else infer from this task's validity mode.
+            "eval_tag": task_eval_tag,
             "reference_code": self.reference_code,
             "kernel_code": action,
             "backend": self.reference_backend,
             "entry_point": self.entry_point,
             "use_reference_cache": False,
             "uuid": self.uuid or "",
-            "is_valid": self.is_valid,
+            "is_valid": task_is_valid,
             "task_timeout": self.task_timeout,
             "task_timeout_in_client": self.task_timeout_in_client,
             "num_correct_trials": self.num_correct_trials,
