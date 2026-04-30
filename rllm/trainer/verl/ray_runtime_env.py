@@ -35,7 +35,9 @@ FORWARD_PREFIXES = [
     "CUDNN_",
     "NV_",
     "NVIDIA_",
-    "RLLM_"
+    "RLLM_",
+    "HCCL_",
+    "GLOO_",
 ]
 
 
