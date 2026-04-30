@@ -36,22 +36,26 @@ def _load_or_register(name: str, split: str, fallback_path: str) -> Dataset:
 # @hydra.main(config_path="pkg://rllm.trainer.config", config_name="agent_ppo_trainer", version_base=None)
 @hydra.main(config_path="pkg://rllm.trainer.config", config_name="agent_ppo_trainer_megatron", version_base=None)
 def main(config):
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    
     train_fallback = config.get("data", {}).get("train_files", "level_1-00000-of-00001.parquet")
     val_fallback = config.get("data", {}).get("val_files", "level_1-00000-of-00001.parquet")
 
-    train_dataset = _load_or_register("kernelbench", "train", train_fallback)
-    test_dataset = _load_or_register("kernelbench", "test", val_fallback)
+    train_dataset = _load_or_register("drkernel_rl_data", "train", train_fallback)
+    test_dataset = _load_or_register("drkernel_rl_data", "test", val_fallback)
 
     trainer = AgentTrainer(
         agent_class=KernelAgent,
         env_class=KernelGymEnv,
-        agent_args={},
-        env_args={"reward_config":config.get("reward_model", {})},
+        agent_args={"message_passthrough": True},       # 是否
+        env_args={"reward_config":config.get("reward_model", {}), "message_passthrough": True},
         config=config,
         train_dataset=train_dataset,
         val_dataset=test_dataset,
     )
     trainer.train()
+
 
 
 if __name__ == "__main__":

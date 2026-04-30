@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import logging
 import re
+import json
 from typing import Any, Optional
 
 from rllm.agents.agent import Action, BaseAgent, Step, Trajectory
@@ -132,11 +133,14 @@ class KernelAgent(BaseAgent):
         self,
         accumulate_thinking: bool = False,
         system_prompt: Optional[str] = None,
+        message_passthrough: bool = False, 
     ):
         self.accumulate_thinking = accumulate_thinking
         self._system_prompt = system_prompt or _SYSTEM_PROMPT
         self._trajectory = Trajectory()
         self.messages: list[dict[str, str]] = []
+
+        self.message_passthrough = message_passthrough
 
     # ------------------------------------------------------------------
     # BaseAgent interface
@@ -200,7 +204,14 @@ class KernelAgent(BaseAgent):
         #! Patch 1. 直接将没有继承 nn.Module 的 ModelNew 进行替换。
         if "class ModelNew:" in kernel_code:
             kernel_code = kernel_code.replace("class ModelNew:", "class ModelNew(nn.Module):")
-        action = Action(action=kernel_code.strip())
+        
+        action_content = kernel_code.strip()
+
+        if self.message_passthrough:
+            action_content += "<|message_passtrhough|>" + json.dumps(self.messages)
+            pass
+        
+        action = Action(action=action_content)
         cur_step.action = action
 
         return action
