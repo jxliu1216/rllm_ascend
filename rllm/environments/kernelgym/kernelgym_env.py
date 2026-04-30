@@ -203,6 +203,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         self.verbose_errors = config.verbose_errors
         self.detect_decoy_kernel = config.detect_decoy_kernel
         self.reference_backend = config.reference_backend
+        self.train_id = str(getattr(config, "train_id", "") or "")
 
         self._worker = _HybridHttpWorker(
             self.server_url, self.rate_limit, int(self.timeout), self.acquire_timeout
@@ -604,6 +605,7 @@ class KernelGymEnv(MultiTurnEnvironment):
             #! 构造请求
             payload = {
                 "task_id": task.get("task_id"),
+                "train_id": task.get("train_id", self.train_id),
                 "reference_code": task.get("reference_code", ""),
                 "kernel_code": kcode,
                 "backend": self.reference_backend,
@@ -747,6 +749,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
         task = {
             "task_id": task_id,
+            "train_id": self.train_id,
             "reference_code": self.reference_code,
             "kernel_code": action,
             "backend": self.reference_backend,
