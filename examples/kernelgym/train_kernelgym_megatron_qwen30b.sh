@@ -34,6 +34,7 @@ export HYDRA_FULL_ERROR=1
 
 # export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
+# MODEL_PATH=/home/g00841271/cszhou_sft_weight/global_step_100
 MODEL_PATH=/home/g00841271/cszhou_sft_weight/global_step_100
 
 echo "正在重启 Ray 集群..."
@@ -170,15 +171,14 @@ ARGS=(
   trainer.n_gpus_per_node=8
   trainer.nnodes=1
   trainer.device=npu
-  trainer.save_freq=5
+  trainer.save_freq=20
   trainer.test_freq=20
   trainer.default_hdfs_dir=null
   trainer.total_epochs=100
 
-  # # =========================
-  # # kernel
-  # # =========================
-
+  # =========================
+  # kernel
+  # =========================
   reward_model.max_turns=3
   reward_model.reference_backend=triton
   reward_model.server_url="http://127.0.0.1:8002"
@@ -213,7 +213,6 @@ ARGS=(
 )
 
 # python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}"
-
 
 ray job submit --address="http://${MASTER_ADDR}:8265" \
     -- \

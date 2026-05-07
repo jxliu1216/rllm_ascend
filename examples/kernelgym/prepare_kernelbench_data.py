@@ -43,7 +43,7 @@ def _hf_row_to_record_cudallm(row: dict) -> dict:
     """Convert a HuggingFace row to the JSONL record format."""
     return {
         "task": {
-            "problem_id": f"{row['extra_info']['uuid']}_{"+".join(json.loads(row["extra_info"]["ops"]))}",
+            "problem_id": f"{row['extra_info']['uuid']}_{'+'.join(json.loads(row['extra_info']['ops']))}",
             "reference_code": row["reward_model"]["ground_truth"],
             "description": "",
             "prompt": row['prompt'][0]['content'],
@@ -91,12 +91,12 @@ def prepare_kernelbench_data(
     # for lvl in train_levels:
     #     ds = load_dataset("ScalingIntelligence/KernelBench", split=split_map[lvl])
     #     train_records.extend(_hf_row_to_record(row) for row in ds)
-    ds = load_dataset("/workspace/rllm-071/hf_dataset/drkernel-rl-data", split="train")
+    ds = load_dataset("./hf_dataset/drkernel-rl-data", split="train")
     train_records = [_hf_row_to_record_cudallm(row) for row in ds]
 
     val_records: list[dict] = []
     for lvl in val_levels:
-        ds = load_dataset("/workspace/rllm-071/hf_dataset/kernelbench", split=split_map[lvl])
+        ds = load_dataset("./hf_dataset/kernelbench", split=split_map[lvl])
         val_records.extend(_hf_row_to_record_kerben(row) for row in ds)
 
     print(f"✅ Train records: {len(train_records)}  Val records: {len(val_records)}")

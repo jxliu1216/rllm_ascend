@@ -70,7 +70,7 @@ ARGS=(
   # =========================
   actor_rollout_ref.actor.optim.lr=1e-6
   actor_rollout_ref.actor.loss_agg_mode=seq-mean-token-mean
-  actor_rollout_ref.actor.ppo_mini_batch_size=2
+  actor_rollout_ref.actor.ppo_mini_batch_size=8     # 实际 minibatch_size = minibatch_size * n_rollout // dp_size
   actor_rollout_ref.actor.use_dynamic_bsz=True
   actor_rollout_ref.actor.ppo_max_token_len_per_gpu=32768
   actor_rollout_ref.actor.use_kl_loss=False
@@ -143,6 +143,7 @@ ARGS=(
   actor_rollout_ref.rollout.val_kwargs.temperature=0.0
   actor_rollout_ref.rollout.val_kwargs.top_p=1.0
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1
+  ++actor_rollout_ref.rollout.engine_kwargs.max_num_seqs=64
   ++actor_rollout_ref.rollout.checkpoint_engine.update_weights_bucket_megabytes=4096
 
   rllm.rejection_sample.enable=True
@@ -151,10 +152,10 @@ ARGS=(
   # rllm
   # =========================
   rllm.mask_truncated_samples=False
-  +rllm.agent.engine_args.n_parallel_agents=16
+  +rllm.agent.engine_args.n_parallel_agents=96
   rllm.agent.max_steps=3
   rllm.stepwise_advantage.enable=True
-  rllm.stepwise_advantage.mode=per_step
+  rllm.stepwise_advantage.mode=broadcast #per_step
 
   # =========================
   # trainer
@@ -214,4 +215,4 @@ ARGS=(
 
 #ray job submit --address="http://${MASTER_ADDR}:8265" \
 #    -- \
-    /usr/bin/python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}"
+/usr/bin/python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}" 2>&1| tee "gpu_training_$(date +%Y%m%d_%H%M%S).log"

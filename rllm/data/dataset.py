@@ -507,7 +507,7 @@ class DatasetRegistry:
         else:
             import polars as pl
 
-            data = pl.read_parquet(dataset_path).to_dicts()
+            data = pl.read_parquet(dataset_path, low_memory=True).to_dicts()
 
         logger.info(f"Loaded dataset '{name}' split '{split}' with {len(data)} examples.")
 

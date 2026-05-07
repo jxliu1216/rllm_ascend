@@ -751,8 +751,8 @@ class KernelGymEnv(MultiTurnEnvironment):
             action, llm_messages = action.split("<|message_passtrhough|>")
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
-        task_is_valid = task.get("is_valid", self.is_valid)
-        task_eval_tag = str(task.get("eval_tag", "") or ("validation" if task_is_valid else "train"))
+        task_is_valid = self.task.get("is_valid", self.is_valid)
+        task_eval_tag = str(self.task.get("eval_tag", "") or ("validation" if task_is_valid else "train"))
         task = {
             "task_id": task_id,
             "train_id": self.train_id,
