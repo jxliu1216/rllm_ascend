@@ -62,6 +62,11 @@ rllm:
   rejection_sample:
     enable: False
     multiplier: 1
+  debug_rollout:
+    save: False
+    load_path: null
+    dir: ${trainer.default_local_dir}/debug_rollouts
+    filename: null
   distill:
     enable: False
     shared_tokenizer: False

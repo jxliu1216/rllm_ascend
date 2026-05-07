@@ -72,6 +72,83 @@ class AgentPPOTrainer(RayPPOTrainer):
         else:
             print("Using trajectory-level advantage, max_prompt_length and max_response_length will be applied episode-wise")
 
+    def _get_debug_rollout_config(self):
+        return self.config.rllm.get("debug_rollout", {})
+
+    def _debug_rollout_enabled(self) -> bool:
+        debug_cfg = self._get_debug_rollout_config()
+        return bool(debug_cfg.get("save", False) or debug_cfg.get("load_path"))
+
+    def _get_debug_rollout_dir(self) -> Path:
+        debug_cfg = self._get_debug_rollout_config()
+        base_dir = debug_cfg.get("dir")
+        if not base_dir:
+            base_dir = os.path.join(self.config.trainer.default_local_dir, "debug_rollouts")
+        path = Path(base_dir)
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def _get_debug_rollout_path(self, global_steps: int) -> Path:
+        debug_cfg = self._get_debug_rollout_config()
+        if debug_cfg.get("load_path"):
+            return Path(debug_cfg.load_path)
+        filename = debug_cfg.get("filename")
+        if filename:
+            return self._get_debug_rollout_dir() / filename
+        return self._get_debug_rollout_dir() / f"rollout_step_{global_steps}.pt"
+
+    @staticmethod
+    def _serialize_trajectory_debug_item(item: dict) -> dict:
+        serialized = {}
+        for key, value in item.items():
+            if isinstance(value, torch.Tensor):
+                serialized[key] = value.detach().cpu()
+            else:
+                serialized[key] = value
+        return serialized
+
+    @staticmethod
+    def _deserialize_trajectory_debug_item(item: dict) -> dict:
+        deserialized = {}
+        for key, value in item.items():
+            if isinstance(value, torch.Tensor):
+                deserialized[key] = value.clone()
+            else:
+                deserialized[key] = value
+        return deserialized
+
+    def _save_debug_rollout_dump(self, trajectories: list[dict], final_gen_batch_output: DataProto, metrics: dict, global_steps: int, mode: str):
+        if not self._get_debug_rollout_config().get("save", False):
+            return
+
+        dump_path = self._get_debug_rollout_path(global_steps)
+        payload = {
+            "global_steps": global_steps,
+            "mode": mode,
+            "stepwise_advantage": bool(self.config.rllm.stepwise_advantage.enable),
+            "trajectories": [self._serialize_trajectory_debug_item(item) for item in trajectories],
+            "metrics": metrics,
+            "final_gen_batch_output": final_gen_batch_output,
+        }
+        torch.save(payload, dump_path)
+        print(f"[debug_rollout] Saved rollout dump to {dump_path}")
+
+    def _load_debug_rollout_dump(self, global_steps: int, mode: str):
+        load_path = self._get_debug_rollout_config().get("load_path")
+        if not load_path:
+            return None
+
+        dump_path = self._get_debug_rollout_path(global_steps)
+        payload = torch.load(dump_path, map_location="cpu", weights_only=False)
+        payload_mode = payload.get("mode", "trajectory")
+        if payload_mode != mode:
+            raise ValueError(f"Debug rollout dump mode mismatch: expected {mode}, got {payload_mode}")
+        trajectories = [self._deserialize_trajectory_debug_item(item) for item in payload["trajectories"]]
+        final_gen_batch_output = payload["final_gen_batch_output"]
+        metrics = payload.get("metrics", {})
+        print(f"[debug_rollout] Loaded rollout dump from {dump_path}")
+        return trajectories, final_gen_batch_output, metrics
+
     def init_workers(self):
         super().init_workers()
 
@@ -577,6 +654,11 @@ class AgentPPOTrainer(RayPPOTrainer):
         """
         if timing_raw is None:
             timing_raw = {}
+        debug_rollout = self._load_debug_rollout_dump(global_steps, mode="trajectory")
+        if debug_rollout is not None:
+            _, final_gen_batch_output, metrics = debug_rollout
+            return final_gen_batch_output, metrics
+
         with marked_timer("collect_trajectory", timing_raw):
             trajectories = []
             if self.async_rollout_mode:
@@ -591,6 +673,7 @@ class AgentPPOTrainer(RayPPOTrainer):
         with marked_timer("transform_trajectory", timing_raw):
             # Transform the raw trajectories into DataProto format.
             final_gen_batch_output, metrics = self._transform_agent_trajectories(trajectories)
+        self._save_debug_rollout_dump(trajectories, final_gen_batch_output, metrics, global_steps, mode="trajectory")
         return final_gen_batch_output, metrics
 
     def generate_agent_steps(self, timing_raw=None, meta_info=None, uids=None):
@@ -605,6 +688,10 @@ class AgentPPOTrainer(RayPPOTrainer):
             timing_raw = {}
         if uids is None:
             uids = []
+        debug_rollout = self._load_debug_rollout_dump(self.global_steps, mode="step")
+        if debug_rollout is not None:
+            _, final_gen_batch_output, _ = debug_rollout
+            return final_gen_batch_output
         with marked_timer("collect_trajectory", timing_raw):
             steps = []
             gen_seq_generator = self.generate_agent_trajectories_async(timing_raw=timing_raw, meta_info=meta_info, mode="Step")
@@ -616,6 +703,7 @@ class AgentPPOTrainer(RayPPOTrainer):
         with marked_timer("transform_trajectory", timing_raw):
             # Transform the raw trajectories into DataProto format.
             final_gen_batch_output = self._transform_agent_steps(steps, uids=uids)
+        self._save_debug_rollout_dump(steps, final_gen_batch_output, {}, self.global_steps, mode="step")
         return final_gen_batch_output
 
     def _transform_agent_trajectories(self, trajectories: list[dict]):
