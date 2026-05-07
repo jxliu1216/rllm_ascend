@@ -174,7 +174,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         super().__init__(task=task, max_turns=config.max_turns)
 
         assert task is not None
-        self.session_uuid = uuid.uuid4().hex[:16]
+        self.session_uuid = uuid.uuid4().hex[:4]
         task["task_id"] = task.get("problem_id", "undefined")
         #! 任务相关的输入
         self.problem_id = task.get("task_id")
@@ -754,7 +754,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         self._last_error = None
         self._last_result = None
 
-        self.session_uuid = uuid.uuid4().hex[:16]
+        self.session_uuid = uuid.uuid4().hex[:4]
 
         return self.task, {}
 

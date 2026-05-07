@@ -43,7 +43,15 @@ def _hf_row_to_record_cudallm(row: dict) -> dict:
     """Convert a HuggingFace row to the JSONL record format."""
     return {
         "task": {
-            "problem_id": f"{row['extra_info']['uuid']}_{'+'.join(json.loads(row['extra_info']['ops']))}",
+            "problem_id": 
+                f"{row['extra_info']['uuid']}"+
+                f"""_{
+                    '+'.join(
+                        map(
+                            lambda s:s.replace('torch.', '').replace('nn.', '').replace('F.', ''),
+                            json.loads(row['extra_info']['ops'])
+                        )
+                    )}""",
             "reference_code": row["reward_model"]["ground_truth"],
             "description": "",
             "prompt": row['prompt'][0]['content'],
