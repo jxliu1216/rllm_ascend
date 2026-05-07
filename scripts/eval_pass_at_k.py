@@ -14,6 +14,7 @@ import logging
 import multiprocessing as mp
 import os
 import sqlite3
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -23,10 +24,13 @@ from uuid import uuid4
 
 import numpy as np
 
+LOG_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
+LOG_DATEFMT = "%H:%M:%S"
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S",
+    format=LOG_FORMAT,
+    datefmt=LOG_DATEFMT,
 )
 logger = logging.getLogger("eval_pass_at_k")
 
@@ -40,6 +44,77 @@ def split_message_passthrough(action: str) -> tuple[str, str]:
             kernel_code, llm_messages = action.split(marker, 1)
             return kernel_code.strip(), llm_messages
     return action, ""
+
+
+class TqdmLoggingHandler(logging.Handler):
+    def __init__(self, tqdm_cls):
+        super().__init__()
+        self._tqdm = tqdm_cls
+
+    def emit(self, record: logging.LogRecord):
+        try:
+            self._tqdm.write(self.format(record))
+        except Exception:
+            self.handleError(record)
+
+
+@contextmanager
+def quiet_worker_output(enabled: bool):
+    if not enabled:
+        yield
+        return
+
+    root = logging.getLogger()
+    old_handlers = root.handlers[:]
+    old_level = root.level
+    with open(os.devnull, "w") as devnull:
+        root.handlers = [logging.NullHandler()]
+        root.setLevel(logging.CRITICAL)
+        try:
+            with redirect_stdout(devnull), redirect_stderr(devnull):
+                yield
+        finally:
+            root.handlers = old_handlers
+            root.setLevel(old_level)
+
+
+class ProgressBar:
+    def __init__(self, total: int, desc: str):
+        self.total = total
+        self.desc = desc
+        self.count = 0
+        self._bar = None
+        self._log_every = max(1, total // 20) if total else 1
+        self._root_logger = None
+        self._old_handlers = None
+
+    def __enter__(self):
+        try:
+            from tqdm import tqdm
+
+            self._bar = tqdm(total=self.total, desc=self.desc, unit="rollout", dynamic_ncols=True, position=0)
+            self._root_logger = logging.getLogger()
+            self._old_handlers = self._root_logger.handlers[:]
+            handler = TqdmLoggingHandler(tqdm)
+            handler.setFormatter(logging.Formatter(LOG_FORMAT, LOG_DATEFMT))
+            self._root_logger.handlers = [handler]
+        except Exception:
+            logger.info("%s progress: 0/%d", self.desc, self.total)
+        return self
+
+    def update(self, *, passed: int, failed: int):
+        self.count += 1
+        if self._bar is not None:
+            self._bar.update(1)
+            self._bar.set_postfix(passed=passed, failed=failed)
+        elif self.count == self.total or self.count % self._log_every == 0:
+            logger.info("%s progress: %d/%d passed=%d failed=%d", self.desc, self.count, self.total, passed, failed)
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._root_logger is not None and self._old_handlers is not None:
+            self._root_logger.handlers = self._old_handlers
+        if self._bar is not None:
+            self._bar.close()
 
 
 @dataclass
@@ -257,6 +332,15 @@ def run_single_rollout(
     args: argparse.Namespace,
     model_name: str,
 ) -> RolloutResult:
+    with quiet_worker_output(getattr(args, "quiet_worker_output", True)):
+        return _run_single_rollout(task, args, model_name)
+
+
+def _run_single_rollout(
+    task: dict[str, Any],
+    args: argparse.Namespace,
+    model_name: str,
+) -> RolloutResult:
     from rllm.agents.kernelgym_agent import KernelAgent
     from rllm.environments.kernelgym.kernelgym_env import KernelGymEnv
 
@@ -297,7 +381,6 @@ def run_single_rollout(
                 )
                 response_text = completion.choices[0].message.content or ""
             except Exception as e:
-                logger.error("[%s] Turn %d LLM error: %s", problem_id, turn_idx + 1, e)
                 result.turns.append(TurnResult(turn=turn_idx, error=f"LLM error: {e}"))
                 break
 
@@ -324,7 +407,7 @@ def run_single_rollout(
             )
             result.turns.append(tr)
             result.total_reward += float(reward)
-            logger.info(
+            logger.debug(
                 "[%s] Turn %d: compiled=%s correct=%s speedup=%.2fx reward=%.3f",
                 problem_id,
                 turn_idx + 1,
@@ -568,6 +651,13 @@ def main():
         default="spawn",
         help="Multiprocessing start method when --worker-backend=process.",
     )
+    parser.add_argument(
+        "--show-worker-logs",
+        dest="quiet_worker_output",
+        action="store_false",
+        help="Show stdout/stderr from worker processes. Disabled by default so the progress bar stays at the bottom.",
+    )
+    parser.set_defaults(quiet_worker_output=True)
     args = parser.parse_args()
 
     k_values = [int(k.strip()) for k in args.k_values.split(",")]
@@ -605,20 +695,28 @@ def main():
             for _ in range(args.num_rollouts):
                 future = executor.submit(run_single_rollout, task, args, model_name)
                 futures[future] = task["problem_id"]
-        for future in as_completed(futures):
-            problem_id = futures[future]
-            try:
-                result = future.result(timeout=args.task_timeout_in_client * args.max_turns + 120)
-                all_results.setdefault(problem_id, []).append(result)
-                db.save_rollout(result)
-                logger.info(
-                    "[%s] Rollout completed: correct=%s speedup=%.2f",
-                    problem_id,
-                    result.final_correct,
-                    result.best_speedup,
-                )
-            except Exception as e:
-                logger.error("[%s] Rollout failed: %s", problem_id, e)
+        passed_rollouts = 0
+        failed_rollouts = 0
+        with ProgressBar(total=len(futures), desc="Rollouts") as progress:
+            for future in as_completed(futures):
+                problem_id = futures[future]
+                try:
+                    result = future.result(timeout=args.task_timeout_in_client * args.max_turns + 120)
+                    all_results.setdefault(problem_id, []).append(result)
+                    db.save_rollout(result)
+                    if result.final_correct:
+                        passed_rollouts += 1
+                    logger.info(
+                        "[%s] Rollout completed: correct=%s speedup=%.2f",
+                        problem_id,
+                        result.final_correct,
+                        result.best_speedup,
+                    )
+                except Exception as e:
+                    failed_rollouts += 1
+                    logger.error("[%s] Rollout failed: %s", problem_id, e)
+                finally:
+                    progress.update(passed=passed_rollouts, failed=failed_rollouts)
 
     problem_stats: list[ProblemStats] = []
     for problem_id, results in all_results.items():
