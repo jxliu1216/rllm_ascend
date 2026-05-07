@@ -8,7 +8,7 @@
 # export HCCL_SOCKET_IFNAME=$nic_name
 
 export FORCE_BUILD=0
-export PYTORCH_NPU_ALLOC_CONF=max_split_size_mb:512
+export PYTORCH_NPU_ALLOC_CONF=max_split_size_mb:128
 export VLLM_ATTENTION_BACKEND="TORCH_SDPA"
 export VLLM_USE_V1=1
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1

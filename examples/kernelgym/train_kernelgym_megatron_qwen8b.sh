@@ -140,7 +140,7 @@ ARGS=(
   # rllm
   # =========================
   rllm.mask_truncated_samples=False
-  +rllm.agent.engine_args.n_parallel_agents=96
+  +rllm.agent.engine_args.n_parallel_agents=128
   rllm.agent.max_steps=3
   rllm.stepwise_advantage.enable=True
   rllm.stepwise_advantage.mode=broadcast
@@ -149,7 +149,7 @@ ARGS=(
   # trainer
   # =========================
   trainer.critic_warmup=0
-  trainer.logger=[console]
+  trainer.logger="[console,wandb]"
   trainer.project_name=rllm-agent
   trainer.experiment_name=kernelgym-dr8b
   trainer.val_before_train=False
@@ -196,6 +196,9 @@ ARGS=(
   reward_model.coverage_reward.reward_type=time_coverage
   reward_model.coverage_reward.enable=false
   reward_model.coverage_reward.weight=0.25
+
+  rllm.debug_rollout.save=True
+  rllm.debug_rollout.load_path=null
 )
 
 # python3 -m examples.kernelgym.train_kernelgym "${ARGS[@]}"
