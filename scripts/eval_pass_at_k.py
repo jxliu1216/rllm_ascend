@@ -11,9 +11,10 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import multiprocessing as mp
 import os
 import sqlite3
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -555,6 +556,18 @@ def main():
     parser.add_argument("--train-id", default="")
     parser.add_argument("--rate-limit", type=int, default=64)
     parser.add_argument("--acquire-timeout", type=int, default=2400)
+    parser.add_argument(
+        "--worker-backend",
+        choices=("process", "thread"),
+        default="process",
+        help="Use process workers by default so signal-based timeouts run in worker main threads.",
+    )
+    parser.add_argument(
+        "--process-start-method",
+        choices=("spawn", "fork", "forkserver"),
+        default="spawn",
+        help="Multiprocessing start method when --worker-backend=process.",
+    )
     args = parser.parse_args()
 
     k_values = [int(k.strip()) for k in args.k_values.split(",")]
@@ -577,7 +590,16 @@ def main():
 
     logger.info("Starting PASS@K evaluation: %d problems, %d rollouts each", len(tasks), args.num_rollouts)
     all_results: dict[str, list[RolloutResult]] = {}
-    with ThreadPoolExecutor(max_workers=args.num_workers) as executor:
+    if args.worker_backend == "process":
+        executor_factory = lambda: ProcessPoolExecutor(
+            max_workers=args.num_workers,
+            mp_context=mp.get_context(args.process_start_method),
+        )
+    else:
+        logger.warning("Using thread workers; signal-based timeouts may fail outside the main thread")
+        executor_factory = lambda: ThreadPoolExecutor(max_workers=args.num_workers)
+
+    with executor_factory() as executor:
         futures: dict[Any, str] = {}
         for task in tasks:
             for _ in range(args.num_rollouts):
