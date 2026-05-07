@@ -18,6 +18,9 @@ from rllm.agents.agent import Action, BaseAgent, Step, Trajectory
 logger = logging.getLogger(__name__)
 
 
+MESSAGE_PASSTHROUGH_MARKER = "<|message_passthrough|>"
+
+
 ##########
 _SYSTEM_PROMPT = """\
 You are looking at this PyTorch code and thinking it could be optimized with Triton. You need to create a Triton version with the `ModelNew`. This triton version must be execution on Ascend NPU platforms.
@@ -208,7 +211,7 @@ class KernelAgent(BaseAgent):
         action_content = kernel_code.strip()
 
         if self.message_passthrough:
-            action_content += "<|message_passtrhough|>" + json.dumps(self.messages)
+            action_content += MESSAGE_PASSTHROUGH_MARKER + json.dumps(self.messages)
             pass
         
         action = Action(action=action_content)
