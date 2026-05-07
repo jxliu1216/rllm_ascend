@@ -17,6 +17,18 @@ from rllm.environments.base.multi_turn_env import MultiTurnEnvironment
 
 logger = logging.getLogger(__name__)
 
+MESSAGE_PASSTHROUGH_MARKER = "<|message_passthrough|>"
+LEGACY_MESSAGE_PASSTHROUGH_MARKER = "<|message_passtrhough|>"
+
+
+def _split_message_passthrough(action: str) -> Tuple[str, str]:
+    """Return kernel code and optional serialized messages from an action string."""
+    for marker in (MESSAGE_PASSTHROUGH_MARKER, LEGACY_MESSAGE_PASSTHROUGH_MARKER):
+        if marker in action:
+            kernel_code, llm_messages = action.split(marker, 1)
+            return kernel_code.strip(), llm_messages
+    return action, ""
+
 
 class _HybridHttpWorker:
     def __init__(self, server_url: str, rate_limit: int, default_timeout: int, acquire_timeout: int) -> None:
@@ -582,7 +594,9 @@ class KernelGymEnv(MultiTurnEnvironment):
             print(f"[WARNING] Adjusting task_timeout_in_client to match task_timeout to respect timeout invariant")
             effective_timeout_in_client = effective_timeout
         
-        kcode = task.get("kernel_code", "")
+        kcode, embedded_llm_messages = _split_message_passthrough(task.get("kernel_code", ""))
+        if embedded_llm_messages and not task.get("llm_messages"):
+            task = {**task, "llm_messages": embedded_llm_messages}
         ep = task.get("entry_point", "Model")
         ok, missing = self._preflight_validate(task.get("reference_code", ""), kcode, ep)
         if not ok:
@@ -723,36 +737,40 @@ class KernelGymEnv(MultiTurnEnvironment):
     def reset(self, task: dict | None = None, seed: int | None = None) -> Tuple[dict, dict]:
         """Reset the environment and return the initial observation."""
         if task is not None:
+            task["task_id"] = task.get("task_id", task.get("problem_id", "undefined"))
             self.task = task
+            self.problem_id = task.get("task_id", task.get("problem_id", "undefined"))
+            self.reference_code = task.get("reference_code", "")
+            self.entry_point = task.get("entry_point", "")
+            self.is_valid = task.get("is_valid", True)
+            self.uuid = task.get("problem_id", None)
 
         assert self.task is not None, "Task must be set before calling reset()"
 
         self.done = False
         self.current_turn = 0
         self.history = []
+        self.meta_info_history = []
         self._last_error = None
         self._last_result = None
 
-        self.session_uuid = uuid.uuid4().hex[:4]
+        self.session_uuid = uuid.uuid4().hex[:16]
 
         return self.task, {}
 
 
     def step(self, action: str, global_steps: int = 0) -> Tuple[Dict[str, Any], float, bool, dict]:
         self.history.append(action)
+        source_task = self.task or {}
 
         #! kernelGYM 要求 task_id 为 problem_session_round 的形式，如果错误匹配，可能不会触发校验，直接走缓存。
-        task_id = f"{self.task.get('problem_id', 'task')}_{self.session_uuid}_{global_steps}|{self.current_turn}"
+        task_id = f"{source_task.get('problem_id', 'task')}_{self.session_uuid}_{global_steps}|{self.current_turn}"
 
-        # self.message_passthrough
-        llm_messages = ""
-        if self.message_passthrough:
-            assert "<|message_passtrhough|>" in action
-            action, llm_messages = action.split("<|message_passtrhough|>")
+        action, llm_messages = _split_message_passthrough(action)
 
         #! 构造 LLM 观测文本，重新构造一遍 task 对象，作为输入
-        task_is_valid = self.task.get("is_valid", self.is_valid)
-        task_eval_tag = str(self.task.get("eval_tag", "") or ("validation" if task_is_valid else "train"))
+        task_is_valid = source_task.get("is_valid", self.is_valid)
+        task_eval_tag = str(source_task.get("eval_tag", "") or ("validation" if task_is_valid else "train"))
         task = {
             "task_id": task_id,
             "train_id": self.train_id,
@@ -794,7 +812,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         return next_obs, reward, self.done, self.task
 
     def close(self):
-        self._worker
+        self._worker.shutdown()
 
     @staticmethod
     def from_dict(env_args: dict) -> "KernelGymEnv":
@@ -802,8 +820,9 @@ class KernelGymEnv(MultiTurnEnvironment):
 
         assert "task" in env_args
         task = env_args.pop("task")
+        message_passthrough = bool(env_args.pop("message_passthrough", False))
 
-        return KernelGymEnv(task=task, config=env_args['reward_config'])
+        return KernelGymEnv(task=task, config=env_args['reward_config'], message_passthrough=message_passthrough)
 
     @staticmethod
     def is_multithread_safe() -> bool:
