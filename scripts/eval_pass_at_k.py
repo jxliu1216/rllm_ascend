@@ -608,7 +608,7 @@ def main():
     parser.add_argument("--max-turns", type=int, default=3)
     parser.add_argument("--k-values", default="1,5,10")
     parser.add_argument("--temperature", type=float, default=0.6)
-    parser.add_argument("--max-tokens", type=int, default=4096)
+    parser.add_argument("--max-tokens", type=int, default=8192)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--limit-problems", type=int, default=None)
     parser.add_argument("--reference-backend", default="triton")
@@ -622,11 +622,11 @@ def main():
     parser.add_argument("--compilation-fail-penalty", type=float, default=-0.5)
     parser.add_argument("--correctness-fail-penalty", type=float, default=-0.3)
     parser.add_argument("--perf-degrade-penalty", type=float, default=-0.1)
-    parser.add_argument("--task-timeout", type=int, default=600)
-    parser.add_argument("--task-timeout-in-client", type=int, default=1800)
+    parser.add_argument("--task-timeout", type=int, default=60)
+    parser.add_argument("--task-timeout-in-client", type=int, default=120)
     parser.add_argument("--max-retries", type=int, default=3)
     parser.add_argument("--num-correct-trials", type=int, default=5)
-    parser.add_argument("--num-perf-trials", type=int, default=100)
+    parser.add_argument("--num-perf-trials", type=int, default=20)
     parser.add_argument("--enable-profiling", action="store_true", default=True)
     parser.add_argument("--disable-profiling", dest="enable_profiling", action="store_false")
     parser.add_argument("--verbose-errors", action="store_true", default=True)
@@ -661,7 +661,7 @@ def main():
         action="store_false",
         help="Show stdout/stderr from worker processes. Disabled by default so the progress bar stays at the bottom.",
     )
-    parser.set_defaults(quiet_worker_output=True)
+    parser.set_defaults(quiet_worker_output=False)
     args = parser.parse_args()
     if not args.train_id:
         args.train_id = f"pass_at_k_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
