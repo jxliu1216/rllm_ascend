@@ -13,13 +13,15 @@ import json
 import logging
 import multiprocessing as mp
 import os
+import signal
 import sqlite3
+import time
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 from uuid import uuid4
 
 import numpy as np
@@ -76,6 +78,158 @@ def quiet_worker_output(enabled: bool):
         finally:
             root.handlers = old_handlers
             root.setLevel(old_level)
+
+
+def process_pool_initializer():
+    """Place each process-pool worker in its own process group for cleanup."""
+    if os.name != "posix":
+        return
+    try:
+        os.setsid()
+    except OSError:
+        try:
+            os.setpgrp()
+        except OSError:
+            pass
+
+
+def executor_processes(executor: Any) -> list[Any]:
+    processes = getattr(executor, "_processes", None)
+    if isinstance(processes, dict):
+        return [proc for proc in processes.values() if proc is not None]
+    return []
+
+
+def pid_exists(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+
+
+def linux_child_pids(pid: int) -> set[int]:
+    task_dir = Path(f"/proc/{pid}/task")
+    children: set[int] = set()
+    if not task_dir.exists():
+        return children
+    try:
+        task_paths = list(task_dir.iterdir())
+    except OSError:
+        return children
+    for task_path in task_paths:
+        try:
+            child_text = (task_path / "children").read_text().strip()
+        except OSError:
+            continue
+        for token in child_text.split():
+            try:
+                children.add(int(token))
+            except ValueError:
+                continue
+    return children
+
+
+def collect_process_tree(root_pids: Iterable[int]) -> set[int]:
+    seen: set[int] = set()
+    stack = [pid for pid in root_pids if pid > 0]
+    while stack:
+        pid = stack.pop()
+        if pid in seen:
+            continue
+        seen.add(pid)
+        stack.extend(child for child in linux_child_pids(pid) if child not in seen)
+    return seen
+
+
+def send_signal_to_workers(pids: Iterable[int], sig: signal.Signals) -> None:
+    current_pgrp = os.getpgrp() if os.name == "posix" and hasattr(os, "getpgrp") else None
+    signaled_groups: set[int] = set()
+    signaled_pids: set[int] = set()
+    for pid in pids:
+        if pid <= 0 or not pid_exists(pid):
+            continue
+
+        sent_group = False
+        if os.name == "posix" and hasattr(os, "killpg") and hasattr(os, "getpgid"):
+            try:
+                pgid = os.getpgid(pid)
+                if pgid != current_pgrp and pgid not in signaled_groups:
+                    os.killpg(pgid, sig)
+                    signaled_groups.add(pgid)
+                    sent_group = True
+            except ProcessLookupError:
+                continue
+            except OSError:
+                sent_group = False
+
+        if sent_group:
+            continue
+
+        for tree_pid in collect_process_tree([pid]):
+            if tree_pid in signaled_pids:
+                continue
+            try:
+                os.kill(tree_pid, sig)
+                signaled_pids.add(tree_pid)
+            except ProcessLookupError:
+                pass
+            except OSError:
+                pass
+
+
+def terminate_processes(processes: Iterable[Any], grace_seconds: float = 3.0) -> None:
+    processes = list(processes)
+    pids = [int(proc.pid) for proc in processes if getattr(proc, "pid", None)]
+    if not pids:
+        return
+
+    logger.warning("Terminating process-pool workers: %s", ", ".join(str(pid) for pid in pids))
+    send_signal_to_workers(pids, signal.SIGTERM)
+    deadline = time.monotonic() + max(0.0, grace_seconds)
+    while time.monotonic() < deadline:
+        for proc in processes:
+            try:
+                proc.join(timeout=0)
+            except Exception:
+                pass
+        if not any(pid_exists(pid) for pid in pids):
+            return
+        time.sleep(0.1)
+
+    alive = [pid for pid in pids if pid_exists(pid)]
+    if alive:
+        logger.warning("Killing unresponsive process-pool workers: %s", ", ".join(str(pid) for pid in alive))
+        send_signal_to_workers(alive, signal.SIGKILL)
+        for proc in processes:
+            try:
+                proc.join(timeout=0.5)
+            except Exception:
+                pass
+
+
+def shutdown_executor(
+    executor: Any,
+    *,
+    worker_backend: str,
+    futures: Iterable[Any],
+    force: bool = False,
+) -> None:
+    processes = executor_processes(executor) if force and worker_backend == "process" else []
+    if force:
+        for future in futures:
+            future.cancel()
+    try:
+        executor.shutdown(wait=not force, cancel_futures=force)
+    except TypeError:
+        executor.shutdown(wait=not force)
+    finally:
+        if force and worker_backend == "process":
+            terminate_processes(processes)
 
 
 class ProgressBar:
@@ -695,13 +849,16 @@ def main():
         executor_factory = lambda: ProcessPoolExecutor(
             max_workers=args.num_workers,
             mp_context=mp.get_context(args.process_start_method),
+            initializer=process_pool_initializer,
         )
     else:
         logger.warning("Using thread workers; signal-based timeouts may fail outside the main thread")
         executor_factory = lambda: ThreadPoolExecutor(max_workers=args.num_workers)
 
-    with executor_factory() as executor:
-        futures: dict[Any, str] = {}
+    executor = executor_factory()
+    futures: dict[Any, str] = {}
+    executor_shutdown = False
+    try:
         for task in tasks:
             for _ in range(args.num_rollouts):
                 future = executor.submit(run_single_rollout, task, args, model_name)
@@ -728,6 +885,14 @@ def main():
                     logger.error("[%s] Rollout failed: %s", problem_id, e)
                 finally:
                     progress.update(passed=passed_rollouts, failed=failed_rollouts)
+    except KeyboardInterrupt:
+        logger.warning("Interrupted; cancelling pending rollouts and terminating workers...")
+        shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=True)
+        executor_shutdown = True
+        raise SystemExit(130)
+    finally:
+        if not executor_shutdown:
+            shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=False)
 
     problem_stats: list[ProblemStats] = []
     for problem_id, results in all_results.items():
