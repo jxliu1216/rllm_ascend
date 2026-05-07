@@ -598,6 +598,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         if embedded_llm_messages and not task.get("llm_messages"):
             task = {**task, "llm_messages": embedded_llm_messages}
         ep = task.get("entry_point", "Model")
+        kcode = "import triton \nimport triton.language as tl\nimport torch\nimport torch.nn as nn\n" + kcode
         ok, missing = self._preflight_validate(task.get("reference_code", ""), kcode, ep)
         if not ok:
             print(f"[HybridClient] preflight failed: missing {missing} entry_point={ep}")
