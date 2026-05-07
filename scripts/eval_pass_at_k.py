@@ -636,7 +636,11 @@ def main():
     parser.add_argument("--is-valid-eval", action="store_true", default=True)
     parser.add_argument("--is-train-eval", dest="is_valid_eval", action="store_false")
     parser.add_argument("--eval-tag", default="")
-    parser.add_argument("--train-id", default="")
+    parser.add_argument(
+        "--train-id",
+        default="",
+        help="Training/evaluation run id shown in KernelGym dashboard. Auto-generated when omitted.",
+    )
     parser.add_argument("--rate-limit", type=int, default=64)
     parser.add_argument("--acquire-timeout", type=int, default=2400)
     parser.add_argument(
@@ -659,6 +663,8 @@ def main():
     )
     parser.set_defaults(quiet_worker_output=True)
     args = parser.parse_args()
+    if not args.train_id:
+        args.train_id = f"pass_at_k_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
 
     k_values = [int(k.strip()) for k in args.k_values.split(",")]
     os.makedirs(args.output_dir, exist_ok=True)
@@ -678,7 +684,12 @@ def main():
         except Exception as e:
             logger.warning("Model auto-detection failed: %s; using %s", e, model_name)
 
-    logger.info("Starting PASS@K evaluation: %d problems, %d rollouts each", len(tasks), args.num_rollouts)
+    logger.info(
+        "Starting PASS@K evaluation: %d problems, %d rollouts each, train_id=%s",
+        len(tasks),
+        args.num_rollouts,
+        args.train_id,
+    )
     all_results: dict[str, list[RolloutResult]] = {}
     if args.worker_backend == "process":
         executor_factory = lambda: ProcessPoolExecutor(
