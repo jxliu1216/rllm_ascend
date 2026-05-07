@@ -1,0 +1,2624 @@
+{
+  "timestamp": "2026-05-06T08:35:23.278645",
+  "config": {
+    "num_problems": 200,
+    "num_rollouts_per_problem": 10,
+    "max_turns": 5,
+    "k_values": [
+      1,
+      5,
+      10
+    ]
+  },
+  "overall_metrics": {
+    "total_rollouts": 2000,
+    "total_passed": 0,
+    "pass_at_k": {
+      "pass@1": 0.0,
+      "pass@5": 0.0,
+      "pass@10": 0.0
+    }
+  },
+  "problem_stats": [
+    {
+      "problem_id": "level1_100_100_HingeLoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_10_10_3D_tensor_matrix_multiplication",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_11_11_4D_tensor_matrix_multiplication",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_12_12_Matmul_with_diagonal_matrices_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_13_13_Matmul_for_symmetric_matrices",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_14_14_Matmul_for_upper_triangular_matrices",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_15_15_Matmul_for_lower_triangular_matrices",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_16_16_Matmul_with_transposed_A",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_17_17_Matmul_with_transposed_B",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_18_18_Matmul_with_transposed_both",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_19_19_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_1_1_Square_matrix_multiplication_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_20_20_LeakyReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_21_21_Sigmoid",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_22_22_Tanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_23_23_Softmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_24_24_LogSoftmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_25_25_Swish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_26_26_GELU_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_27_27_SELU_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_28_28_HardSigmoid",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_29_29_Softplus",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_2_2_Standard_matrix_multiplication_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_30_30_Softsign",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_31_31_ELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_32_32_HardTanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_33_33_BatchNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_34_34_InstanceNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_35_35_GroupNorm_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_36_36_RMSNorm_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_37_37_FrobeniusNorm_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_38_38_L1Norm_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_39_39_L2Norm_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_3_3_Batched_matrix_multiplication",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_40_40_LayerNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_41_41_Max_Pooling_1D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_42_42_Max_Pooling_2D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_43_43_Max_Pooling_3D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_44_44_Average_Pooling_1D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_45_45_Average_Pooling_2D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_46_46_Average_Pooling_3D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_47_47_Sum_reduction_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_48_48_Mean_reduction_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_49_49_Max_reduction_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_4_4_Matrix_vector_multiplication_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_50_50_conv_standard_2D__square_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_51_51_Argmax_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_52_52_Argmin_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_53_53_Min_reduction_over_a_dimension",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_54_54_conv_standard_3D__square_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_55_55_conv_standard_2D__asymmetric_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_56_56_conv_standard_2D__asymmetric_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_57_57_conv_transposed_2D__square_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_58_58_conv_transposed_3D__asymmetric_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_59_59_conv_standard_3D__asymmetric_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_5_5_Matrix_scalar_multiplication",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_60_60_conv_standard_3D__square_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_61_61_conv_transposed_3D__square_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_62_62_conv_standard_2D__square_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_63_63_conv_standard_2D__square_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_64_64_conv_transposed_1D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_65_65_conv_transposed_2D__square_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_66_66_conv_standard_3D__asymmetric_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_67_67_conv_standard_1D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_68_68_conv_transposed_3D__square_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_69_69_conv_transposed_2D__asymmetric_input__asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_6_6_Matmul_with_large_K_dimension_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_70_70_conv_transposed_3D__asymmetric_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_71_71_conv_transposed_2D__asymmetric_input__square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_72_72_conv_transposed_3D_asymmetric_input_asymmetric_kernel___strided_padded_grouped_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_73_73_conv_transposed_3D_asymmetric_input_square_kernel__strided_padded__grouped",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_74_74_conv_transposed_1D_dilated",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_75_75_conv_transposed_2D_asymmetric_input_asymmetric_kernel_strided__grouped____padded____dilated__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_76_76_conv_standard_1D_dilated_strided__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_77_77_conv_transposed_3D_square_input_square_kernel___padded____dilated____strided__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_78_78_conv_transposed_2D_asymmetric_input_asymmetric_kernel___padded__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_79_79_conv_transposed_1D_asymmetric_input_square_kernel___padded____strided____dilated__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_7_7_Matmul_with_small_K_dimension_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_80_80_conv_standard_2D_square_input_asymmetric_kernel___dilated____padded__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_81_81_conv_transposed_2D_asymmetric_input_square_kernel___dilated____padded____strided__",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_82_82_conv_depthwise_2D_square_input_square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_83_83_conv_depthwise_2D_square_input_asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_84_84_conv_depthwise_2D_asymmetric_input_square_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_85_85_conv_depthwise_2D_asymmetric_input_asymmetric_kernel",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_86_86_conv_depthwise_separable_2D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_87_87_conv_pointwise_2D",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_88_88_MinGPTNewGelu",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_89_89_cumsum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_8_8_Matmul_with_irregular_shapes_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_90_90_cumprod",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_91_91_cumsum_reverse",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_92_92_cumsum_exclusive",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_93_93_masked_cumsum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_94_94_MSELoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_95_95_CrossEntropyLoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_96_96_HuberLoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_97_97_ScaledDotProductAttention",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_98_98_KLDivLoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_99_99_TripletMarginLoss",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level1_9_9_Tall_skinny_matrix_multiplication_",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_100_100_ConvTranspose3d_Clamp_Min_Divide",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_10_10_ConvTranspose2d_MaxPool_Hardtanh_Mean_Tanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_11_11_ConvTranspose2d_BatchNorm_Tanh_MaxPool_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_12_12_Gemm_Multiply_LeakyReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_13_13_ConvTranspose3d_Mean_Add_Softmax_Tanh_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_14_14_Gemm_Divide_Sum_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_15_15_ConvTranspose3d_BatchNorm_Subtract",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_16_16_ConvTranspose2d_Mish_Add_Hardtanh_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_17_17_Conv2d_InstanceNorm_Divide",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_18_18_Matmul_Sum_Max_AvgPool_LogSumExp_LogSumExp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_19_19_ConvTranspose2d_GELU_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_1_1_Conv2D_ReLU_BiasAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_20_20_ConvTranspose3d_Sum_ResidualAdd_Multiply_ResidualAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_21_21_Conv2d_Add_Scale_Sigmoid_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_22_22_Matmul_Scale_ResidualAdd_Clamp_LogSumExp_Mish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_23_23_Conv3d_GroupNorm_Mean",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_24_24_Conv3d_Min_Softmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_25_25_Conv2d_Min_Tanh_Tanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_26_26_ConvTranspose3d_Add_HardSwish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_27_27_Conv3d_HardSwish_GroupNorm_Mean",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_28_28_BMM_InstanceNorm_Sum_ResidualAdd_Multiply",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_29_29_Matmul_Mish_Mish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_2_2_ConvTranspose2d_BiasAdd_Clamp_Scaling_Clamp_Divide",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_30_30_Gemm_GroupNorm_Hardtanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_31_31_Conv2d_Min_Add_Multiply",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_32_32_Conv2d_Scaling_Min",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_33_33_Gemm_Scale_BatchNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_34_34_ConvTranspose3d_LayerNorm_GELU_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_35_35_Conv2d_Subtract_HardSwish_MaxPool_Mish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_36_36_ConvTranspose2d_Min_Sum_GELU_Add",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_37_37_Matmul_Swish_Sum_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_38_38_ConvTranspose3d_AvgPool_Clamp_Softmax_Multiply",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_39_39_Gemm_Scale_BatchNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_3_3_ConvTranspose3d_Sum_LayerNorm_AvgPool_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_40_40_Matmul_Scaling_ResidualAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_41_41_Gemm_BatchNorm_GELU_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_42_42_ConvTranspose2d_GlobalAvgPool_BiasAdd_LogSumExp_Sum_Multiply",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_43_43_Conv3d_Max_LogSumExp_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_44_44_ConvTranspose2d_Multiply_GlobalAvgPool_GlobalAvgPool_Mean",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_45_45_Gemm_Sigmoid_LogSumExp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_46_46_Conv2d_Subtract_Tanh_Subtract_AvgPool",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_47_47_Conv3d_Mish_Tanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_48_48_Conv3d_Scaling_Tanh_Multiply_Sigmoid",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_49_49_ConvTranspose3d_Softmax_Sigmoid",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_4_4_Conv2d_Mish_Mish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_50_50_ConvTranspose3d_Scaling_AvgPool_BiasAdd_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_51_51_Gemm_Subtract_GlobalAvgPool_LogSumExp_GELU_ResidualAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_52_52_Conv2d_Activation_BatchNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_53_53_Gemm_Scaling_Hardtanh_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_54_54_Conv2d_Multiply_LeakyReLU_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_55_55_Matmul_MaxPool_Sum_Scale",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_56_56_Matmul_Sigmoid_Sum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_57_57_Conv2d_ReLU_HardSwish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_58_58_ConvTranspose3d_LogSumExp_HardSwish_Subtract_Clamp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_59_59_Matmul_Swish_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_5_5_ConvTranspose2d_Subtract_Tanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_60_60_ConvTranspose3d_Swish_GroupNorm_HardSwish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_61_61_ConvTranspose3d_ReLU_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_62_62_Matmul_GroupNorm_LeakyReLU_Sum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_63_63_Gemm_ReLU_Divide",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_64_64_Gemm_LogSumExp_LeakyReLU_LeakyReLU_GELU_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_65_65_Conv2d_AvgPool_Sigmoid_Sum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_66_66_Matmul_Dropout_Softmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_67_67_Conv2d_GELU_GlobalAvgPool",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_68_68_Matmul_Min_Subtract",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_69_69_Conv2d_HardSwish_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_6_6_Conv3d_Softmax_MaxPool_MaxPool",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_70_70_Gemm_Sigmoid_Scaling_ResidualAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_71_71_Conv2d_Divide_LeakyReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_72_72_ConvTranspose3d_BatchNorm_AvgPool_AvgPool",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_73_73_Conv2d_BatchNorm_Scaling",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_74_74_ConvTranspose3d_LeakyReLU_Multiply_LeakyReLU_Max",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_75_75_Gemm_GroupNorm_Min_BiasAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_76_76_Gemm_Add_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_77_77_ConvTranspose3d_Scale_BatchNorm_GlobalAvgPool",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_78_78_ConvTranspose3d_Max_Max_Sum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_79_79_Conv3d_Multiply_InstanceNorm_Clamp_Multiply_Max",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_7_7_Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_80_80_Gemm_Max_Subtract_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_81_81_Gemm_Swish_Divide_Clamp_Tanh_Clamp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_82_82_Conv2d_Tanh_Scaling_BiasAdd_Max",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_83_83_Conv3d_GroupNorm_Min_Clamp_Dropout",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_84_84_Gemm_BatchNorm_Scaling_Softmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_85_85_Conv2d_GroupNorm_Scale_MaxPool_Clamp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_86_86_Matmul_Divide_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_87_87_Conv2d_Subtract_Subtract_Mish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_88_88_Gemm_GroupNorm_Swish_Multiply_Swish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_89_89_ConvTranspose3d_MaxPool_Softmax_Subtract_Swish_Max",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_8_8_Conv3d_Divide_Max_GlobalAvgPool_BiasAdd_Sum",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_90_90_Conv3d_LeakyReLU_Sum_Clamp_GELU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_91_91_ConvTranspose2d_Softmax_BiasAdd_Scaling_Sigmoid",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_92_92_Conv2d_GroupNorm_Tanh_HardSwish_ResidualAdd_LogSumExp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_93_93_ConvTranspose2d_Add_Min_GELU_Multiply",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_94_94_Gemm_BiasAdd_Hardtanh_Mish_GroupNorm",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_95_95_Matmul_Add_Swish_Tanh_GELU_Hardtanh",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_96_96_ConvTranspose3d_Multiply_Max_GlobalAvgPool_Clamp",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_97_97_Matmul_BatchNorm_BiasAdd_Divide_Swish",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_98_98_Matmul_AvgPool_GELU_Scale_Max",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_99_99_Matmul_GELU_Softmax",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    },
+    {
+      "problem_id": "level2_9_9_Matmul_Subtract_Multiply_ReLU",
+      "num_rollouts": 10,
+      "num_passed": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "5": 0.0,
+        "10": 0.0
+      },
+      "best_speedup": 0.0,
+      "avg_speedup": 0.0,
+      "avg_reward": 0.0
+    }
+  ]
+}

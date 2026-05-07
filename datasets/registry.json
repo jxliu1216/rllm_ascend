@@ -62,6 +62,31 @@
           ]
         }
       }
+    },
+    "drkernel_rl_data": {
+      "metadata": {
+        "source": "ScalingIntelligence/KernelBench",
+        "description": "KernelBench Benchmark Data",
+        "category": "code"
+      },
+      "splits": {
+        "train": {
+          "path": "drkernel_rl_data/train.parquet",
+          "num_examples": 71996,
+          "fields": [
+            "task",
+            "backend"
+          ]
+        },
+        "test": {
+          "path": "drkernel_rl_data/test.parquet",
+          "num_examples": 100,
+          "fields": [
+            "task",
+            "backend"
+          ]
+        }
+      }
     }
   }
 }
