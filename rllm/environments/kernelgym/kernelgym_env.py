@@ -71,9 +71,12 @@ class _HybridHttpWorker:
         start_ts = time.time()
         # Rate-limit only during submission; polling does not consume tokens.
         try:
-            # Submit with limited retries: 429/503/timeout/connect errors.
+            # Submit with limited retries. A read timeout can happen after the
+            # server accepted the synchronous /evaluate request, so do not POST
+            # the same task_id again in that case; fall through to result polling.
             attempt = 0
             unlimited = max_retries is None or max_retries == -1
+            submitted = False
             while unlimited or attempt < (max_retries or 0):
                 try:
                 #     # Acquire token with timeout.
@@ -101,6 +104,7 @@ class _HybridHttpWorker:
                     # except Exception:
                     #     pass
                     if resp.status_code == 200:
+                        submitted = True
                         logger.debug(f"[HybridWorker] HTTP 200 OK. errcode(reason): {json.loads(resp.content.decode('utf-8') or '{}').get('error_code',None)}")
                         break
                     if resp.status_code in (429, 503):
@@ -108,6 +112,10 @@ class _HybridHttpWorker:
                         attempt += 1
                         continue
                     resp.raise_for_status()
+                except httpx.ReadTimeout as e:
+                    submitted = True
+                    logger.warning("[HybridWorker] POST /evaluate read timeout for task_id=%s; polling existing task instead of resubmitting", task_data.get("task_id", ""))
+                    break
                 except (httpx.TimeoutException, httpx.ConnectError) as e:
                     # try:
                     #     self._rate_limit_worker.release.remote()
@@ -127,6 +135,8 @@ class _HybridHttpWorker:
 
             # Poll status at a fixed 1s interval.
             task_id = task_data.get("task_id", "")
+            if not submitted:
+                return {"status": "failed", "error_message": f"Failed to submit task {task_id}"}
             last_status = None
             while time.time() - start_ts < client_timeout:
                 try:
@@ -174,7 +184,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         super().__init__(task=task, max_turns=config.max_turns)
 
         assert task is not None
-        self.session_uuid = uuid.uuid4().hex[:4]
+        self.session_uuid = uuid.uuid4().hex[:8]
         task["task_id"] = task.get("problem_id", "undefined")
         #! 任务相关的输入
         self.problem_id = task.get("task_id")
@@ -681,11 +691,6 @@ class KernelGymEnv(MultiTurnEnvironment):
         #! 评估
         result = self.compute_reward(task=task, use_reference_cache=False)
 
-        #! 有异常高值时会重新跑一遍 compute_reward
-        if result.get("speedup", 0.0) > self.config.speedup_reward_upper_bound:
-            print(f"[DEBUG] speedup is anomaly large, re-execute the environment")
-            result = self.compute_reward(task=task, use_reference_cache=False)
-
         #! 剩下的是统计信息
         score = result.get("score", result.get("reward", 0.0))
         num_custom_kernel = result.get("num_custom_kernel", 0)
@@ -755,7 +760,7 @@ class KernelGymEnv(MultiTurnEnvironment):
         self._last_error = None
         self._last_result = None
 
-        self.session_uuid = uuid.uuid4().hex[:4]
+        self.session_uuid = uuid.uuid4().hex[:8]
 
         return self.task, {}
 
