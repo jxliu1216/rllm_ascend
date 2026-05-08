@@ -41,6 +41,13 @@ python scripts/eval_pass_at_k.py \
     --k-values 1,5,10
 ```
 
+To continue an interrupted run, keep the same `--output-dir` and rerun the command.
+If `interactions.db` already has saved rollouts, the script automatically resumes
+and fills only missing rollouts. Previously saved LLM service-error rollouts are
+deleted and retried by default. New runs record `train_id` in DB metadata, so
+later restarts can reuse it automatically; for older runs, pass the same
+`--train-id` if you want resumed evaluations under the same KernelGym dashboard train.
+
 ### 3. Analyze Results
 
 ```bash
@@ -58,6 +65,8 @@ python scripts/analyze_pass_at_k.py \
 | `VLLM_URL` | `http://localhost:8000/v1` | OpenAI-compatible LLM endpoint |
 | `KERNELGYM_URL` | `http://localhost:8002` | KernelGym server URL |
 | `DATA_PATH` | `data/kernelbench_train.jsonl` | Path to KernelBench data |
+| `RESUME` | `0` | Optional explicit resume flag; existing saved rollouts also trigger auto-resume |
+| `TRAIN_ID` | empty | Optional dashboard train id passed through to `eval_pass_at_k.py` |
 | `OUTPUT_DIR` | `results/pass_at_k_<timestamp>` | Output directory |
 | `NUM_ROLLOUTS` | `10` | Number of rollouts per problem |
 | `MAX_TURNS` | `3` | Maximum feedback iterations |
@@ -206,7 +215,29 @@ python scripts/eval_pass_at_k.py \
     --output-dir results/full_eval
 ```
 
-### Resume from Database
+### Resume Interrupted Evaluation
+
+Continue the same output directory and fill only missing rollouts. `--resume` is
+optional when the DB already has saved rollouts, but it is fine to pass it
+explicitly:
+
+```bash
+python scripts/eval_pass_at_k.py \
+    --num-rollouts 10 \
+    --max-turns 5 \
+    --k-values 1,5,10 \
+    --output-dir results/full_eval \
+    --train-id your_previous_train_id \
+    --resume
+```
+
+With the shell script:
+
+```bash
+OUTPUT_DIR=results/full_eval TRAIN_ID=your_previous_train_id ./scripts/run_pass_at_k_eval.sh
+```
+
+### Analyze Existing Database
 
 If you have an existing database, you can analyze it directly:
 

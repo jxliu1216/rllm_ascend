@@ -364,6 +364,14 @@ class InteractionDatabase:
             )
             """
         )
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS run_metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+            """
+        )
         conn.commit()
         conn.close()
 
@@ -431,11 +439,123 @@ class InteractionDatabase:
         conn.commit()
         conn.close()
 
+    def load_rollouts(self) -> dict[str, list[RolloutResult]]:
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        rollout_rows = cursor.execute(
+            """
+            SELECT rollout_id, problem_id, best_speedup, final_correct, final_compiled, total_reward
+            FROM rollouts
+            ORDER BY id ASC
+            """
+        ).fetchall()
+        turn_rows = cursor.execute(
+            """
+            SELECT rollout_id, turn, compiled, correctness, speedup, reward, error, kernel_code, response, server_result
+            FROM turns
+            ORDER BY rollout_id ASC, turn ASC, id ASC
+            """
+        ).fetchall()
+        conn.close()
+
+        turns_by_rollout: dict[str, list[TurnResult]] = {}
+        for row in turn_rows:
+            server_result = None
+            if row["server_result"]:
+                try:
+                    server_result = json.loads(row["server_result"])
+                except json.JSONDecodeError:
+                    server_result = None
+            turns_by_rollout.setdefault(row["rollout_id"], []).append(
+                TurnResult(
+                    turn=int(row["turn"]),
+                    compiled=bool(row["compiled"]),
+                    correctness=bool(row["correctness"]),
+                    speedup=float(row["speedup"] or 0.0),
+                    reward=float(row["reward"] or 0.0),
+                    error=row["error"],
+                    kernel_code=row["kernel_code"],
+                    response=row["response"],
+                    server_result=server_result,
+                )
+            )
+
+        results: dict[str, list[RolloutResult]] = {}
+        for row in rollout_rows:
+            rollout = RolloutResult(
+                rollout_id=row["rollout_id"],
+                problem_id=row["problem_id"],
+                turns=turns_by_rollout.get(row["rollout_id"], []),
+                best_speedup=float(row["best_speedup"] or 0.0),
+                final_correct=bool(row["final_correct"]),
+                final_compiled=bool(row["final_compiled"]),
+                total_reward=float(row["total_reward"] or 0.0),
+            )
+            results.setdefault(rollout.problem_id, []).append(rollout)
+        return results
+
+    def delete_rollouts(self, rollout_ids: Iterable[str]):
+        rollout_ids = [rid for rid in rollout_ids if rid]
+        if not rollout_ids:
+            return
+
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        for start in range(0, len(rollout_ids), 500):
+            chunk = rollout_ids[start : start + 500]
+            placeholders = ",".join("?" for _ in chunk)
+            cursor.execute(f"DELETE FROM turns WHERE rollout_id IN ({placeholders})", chunk)
+            cursor.execute(f"DELETE FROM rollouts WHERE rollout_id IN ({placeholders})", chunk)
+        conn.commit()
+        conn.close()
+
+    def load_metadata(self) -> dict[str, str]:
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        rows = cursor.execute("SELECT key, value FROM run_metadata").fetchall()
+        conn.close()
+        metadata: dict[str, str] = {}
+        for key, value in rows:
+            try:
+                decoded = json.loads(value)
+            except (TypeError, json.JSONDecodeError):
+                decoded = value
+            metadata[str(key)] = str(decoded)
+        return metadata
+
+    def save_metadata(self, values: dict[str, Any]):
+        if not values:
+            return
+
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        for key, value in values.items():
+            cursor.execute(
+                """
+                INSERT OR REPLACE INTO run_metadata (key, value)
+                VALUES (?, ?)
+                """,
+                (str(key), json.dumps(value, default=str)),
+            )
+        conn.commit()
+        conn.close()
+
 
 def calculate_pass_at_k(n: int, c: int, k: int) -> float:
     if n - k < 0:
         return 0.0
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1)) if n > c else 1.0
+
+
+def aggregate_problem_pass_at_k(problem_stats: list[ProblemStats], k: int) -> float:
+    if not problem_stats:
+        return 0.0
+    return float(np.mean([stats.pass_at_k.get(k, 0.0) for stats in problem_stats]))
+
+
+def has_llm_error(result: RolloutResult) -> bool:
+    return any(str(turn.error or "").startswith("LLM error:") for turn in result.turns)
 
 
 def build_reward_config(args: argparse.Namespace):
@@ -735,9 +855,7 @@ def plot_results(problem_stats: list[ProblemStats], output_dir: str, k_values: l
     plt.close()
 
     fig2, ax = plt.subplots(figsize=(10, 6))
-    total_rollouts = sum(s.num_rollouts for s in problem_stats)
-    total_passed = sum(s.num_passed for s in problem_stats)
-    overall_pass_at_k = {k: calculate_pass_at_k(total_rollouts, total_passed, k) for k in k_values}
+    overall_pass_at_k = {k: aggregate_problem_pass_at_k(problem_stats, k) for k in k_values}
     ax.bar([f"Pass@{k}" for k in k_values], [overall_pass_at_k[k] for k in k_values], color="steelblue")
     ax.set_ylabel("Pass Rate")
     ax.set_title("Overall Pass@K Performance")
@@ -758,6 +876,16 @@ def main():
     parser.add_argument("--data-path", default="data/kernelbench_train.jsonl")
     parser.add_argument("--hf-split", default="level_1")
     parser.add_argument("--output-dir", default="results/pass_at_k")
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Reuse existing interactions.db in --output-dir and run only missing rollouts. Auto-enabled when saved rollouts exist.",
+    )
+    parser.add_argument(
+        "--resume-keep-llm-errors",
+        action="store_true",
+        help="When resuming, count previously saved LLM-error rollouts instead of deleting and rerunning them.",
+    )
     parser.add_argument("--num-rollouts", type=int, default=10)
     parser.add_argument("--max-turns", type=int, default=3)
     parser.add_argument("--k-values", default="1,5,10")
@@ -817,8 +945,6 @@ def main():
     )
     parser.set_defaults(quiet_worker_output=False)
     args = parser.parse_args()
-    if not args.train_id:
-        args.train_id = f"pass_at_k_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
 
     k_values = [int(k.strip()) for k in args.k_values.split(",")]
     os.makedirs(args.output_dir, exist_ok=True)
@@ -826,7 +952,68 @@ def main():
     tasks = load_kernelbench_data(args.data_path, args.hf_split)
     if args.limit_problems:
         tasks = tasks[: args.limit_problems]
+    task_ids = {task["problem_id"] for task in tasks}
+    run_metadata = db.load_metadata()
+    loaded_results = db.load_rollouts()
+    existing_count = sum(len(v) for pid, v in loaded_results.items() if pid in task_ids)
 
+    if existing_count and not args.resume:
+        args.resume = True
+        logger.warning(
+            "Found %d existing rollout(s) in %s; auto-resuming and running only missing rollouts.",
+            existing_count,
+            db.db_path,
+        )
+
+    if not args.train_id and run_metadata.get("train_id"):
+        args.train_id = run_metadata["train_id"]
+        logger.info("Reusing train_id from %s metadata: %s", db.db_path, args.train_id)
+    if not args.train_id:
+        args.train_id = f"pass_at_k_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
+
+    db.save_metadata(
+        {
+            "train_id": args.train_id,
+            "data_path": args.data_path,
+            "hf_split": args.hf_split,
+            "limit_problems": args.limit_problems,
+            "num_rollouts": args.num_rollouts,
+            "max_turns": args.max_turns,
+            "k_values": args.k_values,
+            "updated_at": datetime.now().isoformat(),
+        }
+    )
+
+    all_results: dict[str, list[RolloutResult]] = {}
+    if args.resume:
+        retry_rollout_ids: list[str] = []
+        for problem_id in task_ids:
+            kept_results: list[RolloutResult] = []
+            for result in loaded_results.get(problem_id, []):
+                if has_llm_error(result) and not args.resume_keep_llm_errors:
+                    retry_rollout_ids.append(result.rollout_id)
+                    continue
+                kept_results.append(result)
+            if kept_results:
+                all_results[problem_id] = kept_results
+
+        if retry_rollout_ids:
+            db.delete_rollouts(retry_rollout_ids)
+            logger.warning(
+                "Resume removed %d saved LLM-error rollout(s) from interactions.db so they will be retried",
+                len(retry_rollout_ids),
+            )
+
+        loaded_count = sum(len(v) for v in all_results.values())
+        logger.info("Resume loaded %d existing rollout(s) for %d selected problem(s)", loaded_count, len(all_results))
+        for problem_id, results in all_results.items():
+            if len(results) > args.num_rollouts:
+                logger.warning(
+                    "[%s] has %d existing rollout(s), above requested --num-rollouts=%d; keeping all existing rows",
+                    problem_id,
+                    len(results),
+                    args.num_rollouts,
+                )
     model_name = args.model_name
     if model_name == "default":
         try:
@@ -838,71 +1025,90 @@ def main():
         except Exception as e:
             logger.warning("Model auto-detection failed: %s; using %s", e, model_name)
 
+    scheduled_tasks: list[dict[str, Any]] = []
+    for task in tasks:
+        existing = len(all_results.get(task["problem_id"], [])) if args.resume else 0
+        missing = max(0, args.num_rollouts - existing)
+        scheduled_tasks.extend([task] * missing)
+
     logger.info(
-        "Starting PASS@K evaluation: %d problems, %d rollouts each, train_id=%s",
+        "Starting PASS@K evaluation: %d problems, target %d rollouts each, existing=%d, pending=%d, train_id=%s",
         len(tasks),
         args.num_rollouts,
+        sum(len(v) for v in all_results.values()),
+        len(scheduled_tasks),
         args.train_id,
     )
-    all_results: dict[str, list[RolloutResult]] = {}
-    if args.worker_backend == "process":
-        executor_factory = lambda: ProcessPoolExecutor(
-            max_workers=args.num_workers,
-            mp_context=mp.get_context(args.process_start_method),
-            initializer=process_pool_initializer,
-        )
-    else:
-        logger.warning("Using thread workers; signal-based timeouts may fail outside the main thread")
-        executor_factory = lambda: ThreadPoolExecutor(max_workers=args.num_workers)
 
-    executor = executor_factory()
-    futures: dict[Any, str] = {}
-    executor_shutdown = False
-    try:
-        for task in tasks:
-            for _ in range(args.num_rollouts):
+    if scheduled_tasks:
+        if args.worker_backend == "process":
+            executor_factory = lambda: ProcessPoolExecutor(
+                max_workers=args.num_workers,
+                mp_context=mp.get_context(args.process_start_method),
+                initializer=process_pool_initializer,
+            )
+        else:
+            logger.warning("Using thread workers; signal-based timeouts may fail outside the main thread")
+            executor_factory = lambda: ThreadPoolExecutor(max_workers=args.num_workers)
+
+        executor = executor_factory()
+        futures: dict[Any, str] = {}
+        executor_shutdown = False
+        try:
+            for task in scheduled_tasks:
                 future = executor.submit(run_single_rollout, task, args, model_name)
                 futures[future] = task["problem_id"]
-        passed_rollouts = 0
-        failed_rollouts = 0
-        with ProgressBar(total=len(futures), desc="Rollouts") as progress:
-            for future in as_completed(futures):
-                problem_id = futures[future]
-                try:
-                    result = future.result(timeout=args.task_timeout_in_client * args.max_turns + 120)
-                    all_results.setdefault(problem_id, []).append(result)
-                    db.save_rollout(result)
-                    if result.final_correct:
-                        passed_rollouts += 1
-                    logger.info(
-                        "[%s] Rollout completed: correct=%s speedup=%.2f",
-                        problem_id,
-                        result.final_correct,
-                        result.best_speedup,
-                    )
-                except Exception as e:
-                    failed_rollouts += 1
-                    logger.error("[%s] Rollout failed: %s", problem_id, e)
-                finally:
-                    progress.update(passed=passed_rollouts, failed=failed_rollouts)
-    except KeyboardInterrupt:
-        logger.warning("Interrupted; cancelling pending rollouts and terminating workers...")
-        shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=True)
-        executor_shutdown = True
-        raise SystemExit(130)
-    finally:
-        if not executor_shutdown:
-            shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=False)
+            passed_rollouts = 0
+            failed_rollouts = 0
+            with ProgressBar(total=len(futures), desc="Rollouts") as progress:
+                for future in as_completed(futures):
+                    problem_id = futures[future]
+                    try:
+                        result = future.result(timeout=args.task_timeout_in_client * args.max_turns + 120)
+                        if has_llm_error(result):
+                            failed_rollouts += 1
+                            first_error = next((turn.error for turn in result.turns if turn.error), "LLM error")
+                            logger.error("[%s] Rollout aborted by LLM service error; not saving: %s", problem_id, first_error)
+                            continue
+                        all_results.setdefault(problem_id, []).append(result)
+                        db.save_rollout(result)
+                        if result.final_correct:
+                            passed_rollouts += 1
+                        logger.info(
+                            "[%s] Rollout completed: correct=%s speedup=%.2f",
+                            problem_id,
+                            result.final_correct,
+                            result.best_speedup,
+                        )
+                    except Exception as e:
+                        failed_rollouts += 1
+                        logger.error("[%s] Rollout failed: %s", problem_id, e)
+                    finally:
+                        progress.update(passed=passed_rollouts, failed=failed_rollouts)
+        except KeyboardInterrupt:
+            logger.warning("Interrupted; cancelling pending rollouts and terminating workers...")
+            shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=True)
+            executor_shutdown = True
+            raise SystemExit(130)
+        finally:
+            if not executor_shutdown:
+                shutdown_executor(executor, worker_backend=args.worker_backend, futures=futures.keys(), force=False)
+    else:
+        logger.info("No missing rollouts to run; recomputing summary from existing interactions.db")
 
     problem_stats: list[ProblemStats] = []
-    for problem_id, results in all_results.items():
+    for task in tasks:
+        problem_id = task["problem_id"]
+        results = all_results.get(problem_id, [])
+        if not results:
+            continue
         stats = compute_problem_stats(problem_id, results, k_values)
         problem_stats.append(stats)
         db.save_problem_stats(stats)
 
     total_rollouts = sum(s.num_rollouts for s in problem_stats)
     total_passed = sum(s.num_passed for s in problem_stats)
-    overall_pass_at_k = {k: calculate_pass_at_k(total_rollouts, total_passed, k) for k in k_values}
+    overall_pass_at_k = {k: aggregate_problem_pass_at_k(problem_stats, k) for k in k_values}
     summary = {
         "timestamp": datetime.now().isoformat(),
         "config": {
@@ -911,6 +1117,8 @@ def main():
             "max_turns": args.max_turns,
             "k_values": k_values,
             "reward_func_name": args.reward_func_name,
+            "train_id": args.train_id,
+            "resume": args.resume,
         },
         "overall_metrics": {
             "total_rollouts": total_rollouts,
