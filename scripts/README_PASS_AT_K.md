@@ -165,6 +165,8 @@ Where:
 - `c` = number of correct samples
 - `k` = number of samples to consider
 
+The concrete `k` values are controlled by `--k-values` in the evaluation and analysis scripts.
+
 ### Speedup Rate
 
 Speedup rate is calculated as:
