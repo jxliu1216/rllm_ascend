@@ -56,7 +56,8 @@ $CMD
 echo "Running analysis..."
 python scripts/analyze_pass_at_k.py \
     --db-path $OUTPUT_DIR/interactions.db \
-    --output-dir $OUTPUT_DIR/analysis
+    --output-dir $OUTPUT_DIR/analysis \
+    --k-values $K_VALUES
 
 echo "=========================================="
 echo "Evaluation complete!"
