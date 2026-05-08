@@ -14,6 +14,8 @@ MAX_TURNS="${MAX_TURNS:-3}"
 K_VALUES="${K_VALUES:-1,5,10}"
 NUM_WORKERS="${NUM_WORKERS:-4}"
 LIMIT_PROBLEMS="${LIMIT_PROBLEMS:-}"
+RESUME="${RESUME:-0}"
+TRAIN_ID="${TRAIN_ID:-}"
 
 echo "=========================================="
 echo "PASS@K Evaluation for KernelGym"
@@ -26,6 +28,8 @@ echo "Num Rollouts: $NUM_ROLLOUTS"
 echo "Max Turns: $MAX_TURNS"
 echo "K Values: $K_VALUES"
 echo "Num Workers: $NUM_WORKERS"
+echo "Resume: $RESUME"
+echo "Train ID: ${TRAIN_ID:-<auto>}"
 echo "=========================================="
 
 # Prepare data if needed
@@ -48,6 +52,14 @@ CMD="python scripts/eval_pass_at_k.py \
 
 if [ -n "$LIMIT_PROBLEMS" ]; then
     CMD="$CMD --limit-problems $LIMIT_PROBLEMS"
+fi
+
+if [ -n "$TRAIN_ID" ]; then
+    CMD="$CMD --train-id $TRAIN_ID"
+fi
+
+if [ "$RESUME" = "1" ] || [ "$RESUME" = "true" ]; then
+    CMD="$CMD --resume"
 fi
 
 $CMD
