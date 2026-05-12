@@ -11,6 +11,6 @@ docker run --rm -it \
   --network host \
   --add-host host.docker.internal:host-gateway \
   --entrypoint /opt/workspace/entrypoint.py \
-  -e http_proxy=$http_proxy
-  -e https_proxy=$https_proxy
+  -e http_proxy=$http_proxy \
+  -e https_proxy=$https_proxy \
   openhands-triton-env:v1
