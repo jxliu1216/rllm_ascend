@@ -1,7 +1,7 @@
 docker run --rm -it \
   -e LLM_BASE_URL="https://api.kimi.com/coding/" \
   -e LLM_API_KEY="sk-kimi-VdAI9VWur5mGEE801IWQZlJ8YqzUN1BS6QNRv0a9A1CTXijkCBSBfrTshFop3cmL" \
-  -e LLM_MODEL="openai/Kimi-K2.5" \
+  -e LLM_MODEL="moonshot/Kimi-K2.5" \
   -e WORKSPACE_BASE=/opt/workspace/agent_workdir \
   -e MAX_ITERATIONS=10 \
   -e OBSERVER_API_URL="http://host.docker.internal:18858" \
@@ -13,5 +13,5 @@ docker run --rm -it \
   --entrypoint /opt/workspace/entrypoint.py \
   -e http_proxy="http://p_atlas:proxy%40123@80.253.20.124:8080" \
   -e https_proxy="http://p_atlas:proxy%40123@80.253.20.124:8080" \
-  -e no_proxy=127.0.0.1,.huawei.com,localhost,local,.local \
+  -e no_proxy=127.0.0.1,.huawei.com,localhost,local,.local,.docker.internal \
   openhands-triton-env:v1
