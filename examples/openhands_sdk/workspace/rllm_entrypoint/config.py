@@ -68,11 +68,14 @@ def _load() -> EntrypointConfig:
     operator_arch: str = os.environ.get("OPERATOR_ARCH", "ascend910b1")
 
     md_path = os.path.join(workspace_base, "INSTRUCTIONS.md")
+    task_instruction = ""
     if os.path.exists(md_path):
         with open(md_path) as f:
             lines = [ln for ln in f.read().splitlines()
                         if ln.strip() and not ln.startswith("#")]
         task_instruction = "\n".join(lines).strip()
+    else:
+        task_instruction = os.environ.get("TASK_INSTRUCTION", "")
 
     observer_api_url = os.environ.get("OBSERVER_API_URL", "http://127.0.0.1:18858").rstrip("/")
     upload_interval_s = float(os.environ.get("OBSERVER_UPLOAD_INTERVAL", "5.0"))

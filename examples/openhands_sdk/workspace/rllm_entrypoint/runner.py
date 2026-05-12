@@ -64,21 +64,34 @@ def _write_system_prompt() -> None:
 # ---------------------------------------------------------------------------
 
 def merge_workspace_skills(workspace_base: str, task_scope: Skill=None) -> list:
-    """Merge AGENTS.md + .agents/skills/* + inline task_scope."""
+    """Load only AGENTS.md and skill descriptors (SKILL.md), skip large references."""
     ws = Path(workspace_base)
     skills: list = []
 
-    # if any((ws / name).exists() for name in ("AGENTS.md", "CLAUDE.md", "GEMINI.md")):
-    loaded = load_project_skills(work_dir=str(ws))
-    if loaded:
-        skills.extend(loaded if isinstance(loaded, list) else list(loaded))
+    # Load AGENTS.md as a skill
+    agents_md = ws / "AGENTS.md"
+    if agents_md.exists():
+        try:
+            from openhands.sdk.context.skills.skill import Skill
+            skill = Skill.load(agents_md)
+            skills.append(skill)
+        except Exception:
+            logger.warning("Failed to load AGENTS.md as skill")
 
-    # agents_skills_root = ws / ".agents" / "skills"
-    # if agents_skills_root.is_dir():
-    #     _repo, _knowledge, agent_skills = load_skills_from_dir(str(agents_skills_root))
-    #     skills.extend(agent_skills.values())
+    # Load only SKILL.md from each skill directory, skip references/
+    skills_dir = ws / ".agents" / "skills"
+    if skills_dir.is_dir():
+        for skill_dir in skills_dir.iterdir():
+            if skill_dir.is_dir():
+                skill_md = skill_dir / "SKILL.md"
+                if skill_md.exists():
+                    try:
+                        from openhands.sdk.context.skills.skill import Skill
+                        skill = Skill.load(skill_md)
+                        skills.append(skill)
+                    except Exception:
+                        logger.warning(f"Failed to load skill from {skill_md}")
 
-    # skills.append(task_scope)
     return skills
 
 
@@ -238,6 +251,10 @@ def run() -> int:
         api_key=SecretStr(cfg.llm_api_key),
         base_url=cfg.llm_base_url or None,
         max_output_tokens=4096,
+        extra_headers={"User-Agent": "KimiCLI/1.6"},
+        reasoning_effort="none",
+        enable_encrypted_reasoning=False,
+        native_tool_calling=False,
     )
 
 #     _task_scope = (
