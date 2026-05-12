@@ -11,6 +11,7 @@ docker run --rm -it \
   --network host \
   --add-host host.docker.internal:host-gateway \
   --entrypoint /opt/workspace/entrypoint.py \
-  -e http_proxy=$http_proxy \
-  -e https_proxy=$https_proxy \
+  -e http_proxy="http://p_atlas:proxy%40123@80.253.20.124:8080" \
+  -e https_proxy="http://p_atlas:proxy%40123@80.253.20.124:8080" \
+  -e no_proxy=127.0.0.1,.huawei.com,localhost,local,.local \
   openhands-triton-env:v1
