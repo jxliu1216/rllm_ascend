@@ -1,7 +1,7 @@
 docker run --rm -it \
-  -e LLM_BASE_URL="https://api.kimi.com/coding/" \
+  -e LLM_BASE_URL="https://api.moonshot.com/v1/chat/completions" \
   -e LLM_API_KEY="sk-kimi-VdAI9VWur5mGEE801IWQZlJ8YqzUN1BS6QNRv0a9A1CTXijkCBSBfrTshFop3cmL" \
-  -e LLM_MODEL="moonshot/Kimi-K2.5" \
+  -e LLM_MODEL="moonshot/kimi-k2.5" \
   -e WORKSPACE_BASE=/opt/workspace/agent_workdir \
   -e MAX_ITERATIONS=10 \
   -e OBSERVER_API_URL="http://host.docker.internal:18858" \
